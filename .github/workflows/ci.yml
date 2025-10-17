@@ -24,10 +24,10 @@ jobs:
           python -m pip install -e .[otlp,dev]
 
       - name: Ruff lint
-        run: ruff check .
+        run: python -m ruff check .
 
       - name: Markdown formatting check
-        run: mdformat --check README.md docs
+        run: python -m mdformat --check README.md docs
 
       - name: Type check
         run: mypy
