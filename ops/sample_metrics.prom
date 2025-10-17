@@ -1,0 +1,25 @@
+# Sample metrics for SkillScope Grafana dashboard
+# Load into Prometheus via --storage.tsdb.path or curl to remote_write target
+
+gen_ai_client_operation_duration_count{skill_name="Brand Voice Editor (Safe Demo)"} 42
+gen_ai_client_operation_duration_count{skill_name="Contract Analyzer"} 17
+
+skill_policy_required{skill_name="Brand Voice Editor (Safe Demo)"} 0
+skill_policy_required{skill_name="Contract Analyzer"} 12
+
+skill_files_loaded_count{skill_name="Brand Voice Editor (Safe Demo)"} 1
+skill_files_loaded_count{skill_name="Contract Analyzer"} 3
+
+gen_ai_client_token_usage{skill_name="Brand Voice Editor (Safe Demo)"} 18420
+gen_ai_client_token_usage{skill_name="Contract Analyzer"} 9360
+
+# Histogram buckets for latency (seconds)
+# Example: p95 calculation in Grafana uses these bucketed metrics
+
+gen_ai_client_operation_duration_bucket{skill_name="Brand Voice Editor (Safe Demo)",le="1"} 12
+gen_ai_client_operation_duration_bucket{skill_name="Brand Voice Editor (Safe Demo)",le="2"} 30
+gen_ai_client_operation_duration_bucket{skill_name="Brand Voice Editor (Safe Demo)",le="5"} 42
+
+gen_ai_client_operation_duration_bucket{skill_name="Contract Analyzer",le="1"} 4
+gen_ai_client_operation_duration_bucket{skill_name="Contract Analyzer",le="2"} 11
+gen_ai_client_operation_duration_bucket{skill_name="Contract Analyzer",le="5"} 17

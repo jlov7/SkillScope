@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "skillscope"
+version = "0.1.0"
+description = "OpenTelemetry semantics and tooling for tracking Anthropic Skill usage."
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [
+    { name = "SkillScope contributors" }
+]
+requires-python = ">=3.9"
+dependencies = []
+keywords = ["observability", "telemetry", "opentelemetry", "anthropic", "skills"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+[project.optional-dependencies]
+otlp = [
+    "opentelemetry-sdk>=1.24.0",
+    "opentelemetry-exporter-otlp-proto-grpc>=1.24.0",
+]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/skillscope/skillscope"
+Documentation = "https://github.com/skillscope/skillscope/tree/main/docs"
+Repository = "https://github.com/skillscope/skillscope.git"
+Issues = "https://github.com/skillscope/skillscope/issues"
+
+[project.scripts]
+skillscope = "skillscope.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]

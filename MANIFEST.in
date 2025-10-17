@@ -1,0 +1,6 @@
+include README.md LICENSE
+recursive-include dashboards *.json
+recursive-include docs *.md *.png
+recursive-include examples *.py *.md
+recursive-include ops *.yaml *.yml *.prom
+recursive-include tests *.py
