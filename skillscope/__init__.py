@@ -1,8 +1,8 @@
 """SkillScope package exposing skill instrumentation helpers."""
 
 from .instrumentation import (  # noqa: F401
-    AnthropicInstrumented,
     RECORDER,
+    AnthropicInstrumented,
     default_token_estimator,
     gather_with_skill,
     use_skill,

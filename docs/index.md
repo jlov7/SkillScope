@@ -15,6 +15,7 @@ Welcome! SkillScope is a research-grade observability toolkit that brings OpenTe
 - [Ops Stack](../ops/docker-compose.yaml) — collector + Prometheus + Grafana bundle.
 - [Sample Metrics](../ops/sample_metrics.prom) — seed Prometheus for instant dashboards.
 - [Contributing](../CONTRIBUTING.md) — guidelines if you want to extend SkillScope.
+- [Security Policy](../SECURITY.md) — how to report vulnerabilities.
 
 If you’re evaluating SkillScope, start with the demo workflows:
 

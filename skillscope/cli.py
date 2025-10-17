@@ -4,7 +4,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Iterable, Iterator, List, Mapping, Sequence
+from typing import Any, Iterable, Iterator, List, Mapping, Sequence
 
 from . import __version__
 from .example_data import demo_skill_events, load_demo_skill_summary
@@ -137,8 +137,8 @@ def load_events_from_source(path: Path | None, input_format: str) -> List[dict]:
 
 
 def _summarize_events(events: Iterable[Mapping]) -> dict:
-    totals = {"total_events": 0, "total_tokens": 0}
-    per_skill: dict[str, dict] = {}
+    totals: dict[str, Any] = {"total_events": 0, "total_tokens": 0}
+    per_skill: dict[str, dict[str, Any]] = {}
     for event in events:
         totals["total_events"] += 1
         attrs = event.get("attrs", {})

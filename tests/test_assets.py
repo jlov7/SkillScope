@@ -32,3 +32,16 @@ def test_sample_metrics_has_expected_metrics():
 def test_markdown_files_exist(doc_path):
     path = ROOT / doc_path
     assert path.exists(), f"Expected documentation file missing: {doc_path}"
+
+
+def test_demo_summary_artifact_is_valid_json():
+    path = ROOT / "artifacts" / "skillscope_demo_summary.json"
+    assert path.exists(), "Demo summary artefact missing"
+    data = json.loads(path.read_text(encoding="utf-8"))
+    assert data.get("total_skills") == 1
+    assert any(skill["skill"] == "Brand Voice Editor (Safe Demo)" for skill in data.get("skills", []))
+
+
+def test_security_policy_present():
+    path = ROOT / "SECURITY.md"
+    assert path.exists(), "SECURITY.md missing"

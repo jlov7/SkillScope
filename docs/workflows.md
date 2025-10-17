@@ -112,10 +112,11 @@ docker exec ops-prometheus-1 sh -c 'mv /tmp/skillscope-demo/* /prometheus'
 ```
 
 Then:
+
 1. Point your app at `OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317`.
-2. Import `dashboards/grafana_skillscope.json` in Grafana (http://localhost:3000, password `skillscope`).
-3. Preview the expected layout via `docs/assets/grafana-dashboard.png`.
-4. Watch Skill adoption, file usage, policy rate, token trends, and latency p95 in real time.
+1. Import `dashboards/grafana_skillscope.json` in Grafana (http://localhost:3000, password `skillscope`).
+1. Preview the expected layout via `docs/assets/grafana-dashboard.png`.
+1. Watch Skill adoption, file usage, policy rate, token trends, and latency p95 in real time.
 
 ## 6. Troubleshooting
 

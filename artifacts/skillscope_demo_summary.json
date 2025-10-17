@@ -1,0 +1,25 @@
+{
+  "total_events": 2,
+  "total_skills": 1,
+  "total_tokens": 642,
+  "skills": [
+    {
+      "skill": "Brand Voice Editor (Safe Demo)",
+      "events": 2,
+      "calls": 1,
+      "policy_required": 0,
+      "policy_rate": 0.0,
+      "tokens_total": 642,
+      "tokens_average": 321.0,
+      "files": [
+        "examples/skills/brand_voice/style-guide/brand-voice.md"
+      ],
+      "models": [
+        "claude-3-5-sonnet"
+      ],
+      "progressive_levels": [
+        "referenced"
+      ]
+    }
+  ]
+}

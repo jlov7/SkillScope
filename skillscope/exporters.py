@@ -6,10 +6,9 @@ import sys
 import time
 import urllib.error
 import urllib.request
-from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Iterator, List, MutableMapping, Optional, Sequence
+from typing import Iterable, List, MutableMapping, Optional, Sequence
 
 try:
     from opentelemetry import trace
@@ -19,7 +18,9 @@ try:
     from opentelemetry.sdk.trace.export import SpanExporter as _SpanExporter  # type: ignore
 
     try:
-        from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter  # type: ignore
+        from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import (
+            OTLPSpanExporter,  # type: ignore
+        )
     except Exception:
         OTLPSpanExporter = None  # type: ignore
 

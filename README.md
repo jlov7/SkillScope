@@ -1,35 +1,44 @@
-SkillScope — OpenTelemetry for Claude Skills (research-only)
-============================================================
+# SkillScope — OpenTelemetry for Claude Skills (research-only)
 
 SkillScope adds observability to Anthropic *Skills* so you can see which Skill was intended, which files were referenced, whether policy approval was required, and how tokens or latency shifted. Everything here is non-commercial, vendor-neutral, and driven by publicly available Anthropic and OpenTelemetry standards.
 
-At a glance
------------
+## At a glance
+
 - **Audience** — Product & operations leads, engineering teams, and observability practitioners who need transparent Skill usage.
 - **Signals** — `skill.*` attributes layered on top of the OpenTelemetry GenAI & Agent conventions.
 - **Outputs** — NDJSON events, OTLP traces/metrics, Grafana dashboards, and human-readable summaries (`skillscope analyze`).
 
-Audience quick links
---------------------
+## Audience quick links
+
 - Product/Ops teams: start with [docs/reporting.md](docs/reporting.md).
 - Engineers / platform owners: see [docs/workflows.md](docs/workflows.md).
 - Observability background + glossary: read [docs/overview.md](docs/overview.md).
 - Browse everything: [docs/index.md](docs/index.md).
 
-Quickstart (2 minutes)
-----------------------
+## Quickstart (2 minutes)
 
 ```bash
-python -m pip install -e .
+git clone https://github.com/skillscope/skillscope.git
+cd skillscope
+python -m pip install -e .[dev]
 export SKILLSCOPE_CAPTURE=1     # optional JSON capture per Anthropic call
 python examples/run_with_skill.py
 skillscope emit --demo          # emits synthetic spans/events to stdout
 ```
 
-You can then import `dashboards/grafana_skillscope.json` into Grafana (backed by Prometheus/OTLP) or run the bundled collector stack (see below).
+You can then import `dashboards/grafana_skillscope.json` into Grafana (backed by Prometheus/OTLP) or run the bundled collector stack (see below). CI parity lives in `.github/workflows/ci.yml`, which runs ruff, mypy, pytest, and demo artefact generation.
 
-Core features
--------------
+### Semantic conventions
+
+GenAI and Agent semantic conventions continue to evolve. To opt into the current stable set, export:
+
+```bash
+export OTEL_SEMCONV_STABILITY_OPT_IN=gen-ai
+```
+
+See the OpenTelemetry GenAI & Agent specs for details.
+
+## Core features
 
 - **Instrumentation helpers**
   - `use_skill`, `use_skill_async`, and `with_skill` decorator wrap Skill-aware sections while handling context propagation.
@@ -48,8 +57,17 @@ Core features
   - `ops/docker-compose.yaml` boots an OpenTelemetry Collector + Prometheus + Grafana loop for local experimentation (see `docs/assets/grafana-dashboard.png` for a preview).
   - `ops/sample_metrics.prom` seeds Prometheus with realistic demo data.
 
-CLI cheatsheet
---------------
+## Sample artefacts
+
+- `artifacts/skillscope_demo_summary.json` — output of `skillscope analyze --demo --format json`.
+- `docs/assets/grafana-dashboard.png` — dashboard preview.
+
+## Telemetry scope
+
+- When provider SDKs do not expose token metrics, SkillScope uses a heuristic estimator. Prefer native provider token usage fields whenever they are available.
+- The auxiliary `skillscope.*` attributes intentionally avoid collisions with `gen_ai.*` and `gen_ai.agent.*` keys while semantic conventions continue to stabilize.
+
+## CLI cheatsheet
 
 | Command | Purpose | Notes |
 | --- | --- | --- |
@@ -58,8 +76,7 @@ CLI cheatsheet
 | `skillscope analyze path/to/logs` | Summarize Skill activity for stakeholders | `--format json` for automation; add `--demo` to preview |
 | `skillscope demo` | Show bundled Skill documentation | Uses safe synthetic content |
 
-Environment variables
----------------------
+## Environment variables
 
 | Variable | Meaning |
 | --- | --- |
@@ -68,8 +85,7 @@ Environment variables
 | `SKILLSCOPE_EXPORT_OTLP` | `1` enables OTLP exporters; respects `SKILLSCOPE_OTLP_ENDPOINT` / `OTEL_EXPORTER_OTLP_ENDPOINT` |
 | `SKILLSCOPE_EXPORT_NDJSON_PATH` | File path for persisted NDJSON lines |
 
-Observability stack demo
-------------------------
+## Observability stack demo
 
 ```bash
 cd ops
@@ -79,40 +95,41 @@ docker compose up
 
 Import the Grafana dashboard (`dashboards/grafana_skillscope.json`) and point it to the Prometheus data source to explore Skill KPIs such as calls, approval rate, token flow, file usage, and p95 latency. Use `docs/assets/grafana-dashboard.png` for a quick preview of the layout. The Prometheus sample dataset at `ops/sample_metrics.prom` can be ingested inside the Prometheus container using `promtool tsdb create-blocks-from openmetrics /etc/prometheus/sample_metrics.prom /tmp/skillscope-demo` followed by `mv /tmp/skillscope-demo/* /prometheus` for an instant demo.
 
-Non-technical reporting flow
-----------------------------
+## Non-technical reporting flow
 
 1. Ask an engineer to export Skill events (`skillscope emit` or `skillscope ingest`) into a JSONL file.
-2. Run `skillscope analyze exported-events.jsonl` to print a table showing calls, policy rate, token averages, and referenced files per Skill.
-3. Share the table output directly in status updates, or use `--format json` to feed your own dashboards/spreadsheets.
-4. Want a dry run? `skillscope analyze --demo` prints a sample summary without needing data.
-5. For live dashboards, point your telemetry stack (OTLP/Prometheus) at the collector and import the Grafana JSON.
+1. Run `skillscope analyze exported-events.jsonl` to print a table showing calls, policy rate, token averages, and referenced files per Skill.
+1. Share the table output directly in status updates, or use `--format json` to feed your own dashboards/spreadsheets.
+1. Want a dry run? `skillscope analyze --demo` prints a sample summary without needing data.
+1. For live dashboards, point your telemetry stack (OTLP/Prometheus) at the collector and import the Grafana JSON.
 
-For engineers
--------------
+## For engineers
 
 - Add instrumentation by wrapping Skill-bound sections with `use_skill`/`with_skill`. See concrete examples in [docs/workflows.md](docs/workflows.md).
 - When the Anthropic Python SDK is available, `AnthropicInstrumented` will forward requests while injecting metadata; otherwise, it returns a mock preview plus estimated token usage so tests stay deterministic.
 - Configure exporters using environment variables (`SKILLSCOPE_EXPORT_OTLP=1`) and optional extras (`pip install skillscope[otlp]`) to stream spans straight into your collector.
 
-Limitations
------------
+## Limitations
 
 Claude’s native Skills telemetry isn’t exposed via API today; SkillScope annotates your own calls and harnesses. Treat it as developer-side instrumentation, not a reverse-engineering tool. For canonical behavior, always refer to Anthropic’s documentation. ([Claude Docs][3])
 
-References
-----------
+## References
 
 - Anthropic announcement & engineering deep-dive on Skills ([Anthropic][1])
 - Anthropic Help Center — creating & using Skills
 - Claude Code Skills guide
+- Anthropic public Skills examples and templates ([GitHub][5])
 - OpenTelemetry GenAI & Agent semantic conventions ([OpenTelemetry][2])
 
-Contributing
-------------
+## Contributing
 
 Interested in improving SkillScope? Review [CONTRIBUTING.md](CONTRIBUTING.md) for development workflow, testing checklist, and code of conduct.
+
+## Security
+
+For vulnerability disclosures, follow the guidance in [SECURITY.md](SECURITY.md).
 
 [1]: https://www.anthropic.com/news/claude-team-skills
 [2]: https://opentelemetry.io/docs/specs/semconv/gen-ai/
 [3]: https://docs.anthropic.com/
+[5]: https://github.com/anthropics/skills

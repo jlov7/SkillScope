@@ -5,6 +5,7 @@ SkillScope is an Apache-2.0 research project that instruments Anthropic *Skills*
 ## What is a Skill?
 
 Anthropic Skills bundle procedural knowledge into a folder that contains:
+
 - `SKILL.md` describing purpose, inputs, outputs, and policy constraints.
 - Optional supporting files (style guides, scripts, resources).
 - Progressive disclosure levels letting agents load metadata first, then referenced files, then higher-privilege execution.
@@ -32,13 +33,29 @@ SkillScope extends the [OpenTelemetry GenAI & Agent semantic conventions](https:
 
 These attributes integrate with any OpenTelemetry-compatible backend (Prometheus, Grafana, Honeycomb, Lightstep, etc.).
 
+## Semantic mapping
+
+SkillScope attributes complement the OpenTelemetry GenAI & Agent semantic conventions.
+
+| SkillScope attribute | Related OTEL attribute(s) | Purpose |
+| --- | --- | --- |
+| `skill.name` | `gen_ai.operation.name` (where applicable) | Human-friendly Skill identifier for spans/logs. |
+| `skill.version` | `gen_ai.model.schema.version` | Tracks Skill revisions alongside model schema changes. |
+| `skill.files` / `skill.files_loaded_count` | `gen_ai.input.tokens` (indirect) | Describes referenced resources so teams can audit file usage. |
+| `skill.policy_required` | `gen_ai.agent.response.status` | Flags workflows that require human approval. |
+| `skill.progressive_level` | `gen_ai.agent.operation` | Clarifies disclosure level (`metadata`, `referenced`, `eager`). |
+| `skillscope.*` (extra attrs) | `gen_ai.*` / `gen_ai.agent.*` | Custom dimensions that avoid collisions with official keys while specs stabilize. |
+
+> Tip: export `OTEL_SEMCONV_STABILITY_OPT_IN=gen-ai` to opt into the evolving GenAI/Agent conventions.
+
 ## Data products
 
 SkillScope emits information in three primary forms:
+
 1. **Spans and metrics** — OpenTelemetry-structured events for live observability pipelines.
-2. **NDJSON event streams** — Lightweight line-delimited JSON for local analysis or ad-hoc scripting.
-3. **Human-readable summaries** — `skillscope analyze` converts raw events into tables/JSON for status reports.
-4. **Dashboards** — Grafana JSON plus a visual preview (`docs/assets/grafana-dashboard.png`) so stakeholders know what to expect.
+1. **NDJSON event streams** — Lightweight line-delimited JSON for local analysis or ad-hoc scripting.
+1. **Human-readable summaries** — `skillscope analyze` converts raw events into tables/JSON for status reports.
+1. **Dashboards** — Grafana JSON plus a visual preview (`docs/assets/grafana-dashboard.png`) so stakeholders know what to expect.
 
 ## Project structure
 

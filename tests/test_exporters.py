@@ -1,11 +1,7 @@
 from __future__ import annotations
 
-import io
 import json
 import urllib.error
-from types import SimpleNamespace
-
-import pytest
 
 from skillscope.exporters import (
     HTTPOTLPExporter,

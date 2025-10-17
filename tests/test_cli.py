@@ -7,8 +7,8 @@ import pytest
 
 from skillscope import __version__
 from skillscope.cli import cmd_analyze, cmd_demo, cmd_emit, cmd_ingest, main
-from skillscope.exporters import HTTPOTLPExporter
 from skillscope.example_data import demo_skill_events
+from skillscope.exporters import HTTPOTLPExporter
 
 
 def test_emit_demo_to_stdout(monkeypatch, capsys):

@@ -6,8 +6,8 @@ import json
 import pytest
 
 from skillscope.instrumentation import (
-    AnthropicInstrumented,
     RECORDER,
+    AnthropicInstrumented,
     default_token_estimator,
     gather_with_skill,
     use_skill,

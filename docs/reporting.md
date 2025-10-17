@@ -5,6 +5,7 @@ This guide is written for product managers, operations partners, and policy team
 ## What you get
 
 SkillScope creates a short record every time your team intends to use a Claude Skill. Each record captures:
+
 - The Skill name and version
 - How many files were loaded
 - Whether policy approval was required
@@ -16,7 +17,8 @@ You can turn those records into clear summaries with a single command.
 ## Step-by-step: Weekly summary
 
 1. **Ask an engineer** to export the week’s SkillScope events (JSONL file). They can run `skillscope emit --input ... --stdout > week.jsonl`.
-2. **Run the analyzer**:
+
+1. **Run the analyzer**:
 
    ```bash
    skillscope analyze week.jsonl
@@ -36,9 +38,9 @@ You can turn those records into clear summaries with a single command.
    Contract Analyzer                     7       421.5       57.1 contracts/nda.md               claude-3-opus
    ```
 
-3. **Share the table** in docs, email, or chat. It reads like a status update—no engineering jargon required.
+1. **Share the table** in docs, email, or chat. It reads like a status update—no engineering jargon required.
 
-4. **Need spreadsheets?** Use JSON output:
+1. **Need spreadsheets?** Use JSON output:
 
    ```bash
    skillscope analyze week.jsonl --format json > week-summary.json
@@ -46,15 +48,19 @@ You can turn those records into clear summaries with a single command.
 
    Upload the JSON into your favorite BI tool or add it to Google Sheets with an importer.
 
-5. **No data yet?** Try `skillscope analyze --demo` to see a sample summary line-up.
+1. **No data yet?** Try `skillscope analyze --demo` to see a sample summary line-up.
 
 ## Live dashboards (optional)
 
 If your organization already runs Grafana or another telemetry tool:
+
 1. Ask the platform team to set `SKILLSCOPE_EXPORT_OTLP=1` on workloads that use Skills.
-2. Point the endpoint to a collector (the repo ships with `ops/docker-compose.yaml` if you want to try it locally).
-3. Import `dashboards/grafana_skillscope.json` into Grafana. Preview the layout via `docs/assets/grafana-dashboard.png`.
-4. (Optional) After `cd ops`, run:
+
+1. Point the endpoint to a collector (the repo ships with `ops/docker-compose.yaml` if you want to try it locally).
+
+1. Import `dashboards/grafana_skillscope.json` into Grafana. Preview the layout via `docs/assets/grafana-dashboard.png`.
+
+1. (Optional) After `cd ops`, run:
 
    ```bash
    docker exec ops-prometheus-1 promtool tsdb create-blocks-from openmetrics /etc/prometheus/sample_metrics.prom /tmp/skillscope-demo

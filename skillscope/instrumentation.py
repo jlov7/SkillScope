@@ -10,13 +10,10 @@ from contextvars import ContextVar
 from typing import Any, Callable, Dict, Iterable, Iterator, Optional, TypeVar
 
 from .example_data import attrs_to_summary
-
 from .semconv import (
     DEFAULT_PROGRESSIVE_LEVEL,
     GENAI_MODEL,
     GENAI_TOKEN_USAGE,
-    SKILL_NAME,
-    SKILL_PROGRESSIVE_LEVEL,
     skill_attrs,
 )
 
