@@ -1,15 +1,18 @@
-from skillscope.instrumentation import AnthropicInstrumented, use_skill
+from pathlib import Path
+
+from skillscope.instrumentation import AnthropicInstrumented, use_skill_from_path
 
 
 def main() -> None:
     client = AnthropicInstrumented()
-    with use_skill(
-        name="Brand Voice Editor (Safe Demo)",
-        version="1.0.0",
-        files=["examples/skills/brand_voice/style-guide/brand-voice.md"],
+    skill_dir = Path(__file__).resolve().parent / "skills" / "brand-voice"
+    with use_skill_from_path(
+        skill_dir,
+        files=["examples/skills/brand-voice/style-guide/brand-voice.md"],
         policy_required=False,
         progressive_level="referenced",
         model="claude-3-5-sonnet",
+        operation="invoke_agent",
     ):
         response = client.messages_create(
             model="claude-3-5-sonnet",
@@ -26,4 +29,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

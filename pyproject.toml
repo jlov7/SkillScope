@@ -4,16 +4,18 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "skillscope"
-version = "0.1.0"
-description = "OpenTelemetry semantics and tooling for tracking Anthropic Skill usage."
+version = "0.2.0"
+description = "OpenTelemetry semantics and tooling for tracking Agent Skills usage."
 readme = "README.md"
 license = { file = "LICENSE" }
 authors = [
     { name = "SkillScope contributors" }
 ]
 requires-python = ">=3.9"
-dependencies = []
-keywords = ["observability", "telemetry", "opentelemetry", "anthropic", "skills"]
+dependencies = [
+    "strictyaml>=1.6.2",
+]
+keywords = ["observability", "telemetry", "opentelemetry", "agent-skills", "skills"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "License :: OSI Approved :: Apache Software License",
@@ -31,6 +33,7 @@ otlp = [
 ]
 dev = [
     "pytest>=7.4",
+    "pytest-asyncio>=0.24.0",
     "pytest-cov>=4.1",
     "ruff>=0.5.0",
     "mypy>=1.8.0",

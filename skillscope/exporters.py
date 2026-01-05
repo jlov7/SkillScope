@@ -10,6 +10,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, List, MutableMapping, Optional, Sequence
 
+from .semconv import GENAI_OPERATION, GENAI_TOOL_NAME, SKILL_NAME
+
 try:
     from opentelemetry import trace
     from opentelemetry.sdk.resources import Resource
@@ -173,7 +175,7 @@ def coalesce_spans(events: Sequence[MutableMapping]) -> List[CoalescedSpan]:
     spans: List[CoalescedSpan] = []
     for event in events:
         attrs = event.get("attrs", {})
-        name = attrs.get("skill.name") or attrs.get("skill", "skill")
+        name = _span_name(attrs)
         ts = float(event.get("ts") or time.time())
         if event.get("event") == "start":
             active.append({"name": name, "start": ts, "attrs": dict(attrs)})
@@ -203,6 +205,19 @@ def coalesce_spans(events: Sequence[MutableMapping]) -> List[CoalescedSpan]:
             )
         )
     return spans
+
+
+def _span_name(attrs: MutableMapping) -> str:
+    operation = attrs.get(GENAI_OPERATION)
+    tool = attrs.get(GENAI_TOOL_NAME)
+    if operation == "execute_tool" and tool:
+        return f"{operation} {tool}"
+    skill_name = attrs.get(SKILL_NAME) or attrs.get("skill")
+    if skill_name:
+        return str(skill_name)
+    if operation:
+        return str(operation)
+    return "skill"
 
 
 class OTelSDKTraceExporter(BaseExporter):

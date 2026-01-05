@@ -9,7 +9,22 @@ from typing import Any, Iterable, Iterator, List, Mapping, Sequence
 from . import __version__
 from .example_data import demo_skill_events, load_demo_skill_summary
 from .exporters import configure_exporters, export_events
-from .semconv import GENAI_MODEL, GENAI_TOKEN_USAGE, SKILL_NAME, skill_attrs
+from .semconv import (
+    GENAI_MODEL,
+    GENAI_TOKEN_USAGE,
+    GENAI_USAGE_INPUT,
+    GENAI_USAGE_OUTPUT,
+    SKILL_NAME,
+    skill_attrs,
+)
+from .skills import (
+    SkillProblem,
+    collect_skill_dirs,
+    discover_skills,
+    problems_to_json,
+    skills_to_prompt_xml,
+    validate_skill_dir,
+)
 
 
 def _iter_paths(path: Path) -> Iterator[Path]:
@@ -21,6 +36,15 @@ def _iter_paths(path: Path) -> Iterator[Path]:
         yield path
 
 
+def _safe_int(value: Any) -> Optional[int]:
+    if value is None or value == "":
+        return None
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
 def _normalize_events(events: Iterable[dict]) -> List[dict]:
     normalized: List[dict] = []
     for event in events:
@@ -29,20 +53,34 @@ def _normalize_events(events: Iterable[dict]) -> List[dict]:
         if metadata:
             attrs.update({k: v for k, v in metadata.items() if k.startswith("skill.")})
 
+        input_tokens = _safe_int(event.get("input_tokens") or attrs.get(GENAI_USAGE_INPUT))
+        output_tokens = _safe_int(event.get("output_tokens") or attrs.get(GENAI_USAGE_OUTPUT))
+        legacy_tokens = _safe_int(event.get("token_usage") or attrs.get(GENAI_TOKEN_USAGE))
+
         if not attrs.get(SKILL_NAME):
             attrs = skill_attrs(
                 name=attrs.get("skill.name") or event.get("skill", "unknown"),
                 version=attrs.get("skill.version") or event.get("version"),
+                description=attrs.get("skill.description") or event.get("description"),
                 files=attrs.get("skill.files", "").split(",") if attrs.get("skill.files") else event.get("files") or [],
                 policy_required=attrs.get("skill.policy_required") or bool(event.get("policy_required", False)),
                 progressive_level=attrs.get("skill.progressive_level") or event.get("progressive_level", "referenced"),
                 model=event.get("model"),
-                token_usage=event.get("token_usage") or attrs.get(GENAI_TOKEN_USAGE),
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+                token_usage=legacy_tokens,
+                operation=event.get("operation"),
                 agent_operation=event.get("agent_operation"),
             )
         else:
             canonical = skill_attrs(name=attrs.get(SKILL_NAME))
             canonical.update(attrs)
+            if input_tokens is not None:
+                canonical[GENAI_USAGE_INPUT] = input_tokens
+            if output_tokens is not None:
+                canonical[GENAI_USAGE_OUTPUT] = output_tokens
+            if legacy_tokens is not None:
+                canonical[GENAI_TOKEN_USAGE] = legacy_tokens
             attrs = canonical
 
         normalized.append(
@@ -116,8 +154,11 @@ def _anthropic_messages_to_events(payload: dict) -> List[dict]:
         )
     usage = payload.get("usage")
     if usage and events:
-        token_usage = usage.get("input_tokens", 0) + usage.get("output_tokens", 0)
-        events[-1]["attrs"][GENAI_TOKEN_USAGE] = token_usage
+        input_tokens = int(usage.get("input_tokens", 0))
+        output_tokens = int(usage.get("output_tokens", 0))
+        events[-1]["attrs"][GENAI_USAGE_INPUT] = input_tokens
+        events[-1]["attrs"][GENAI_USAGE_OUTPUT] = output_tokens
+        events[-1]["attrs"][GENAI_TOKEN_USAGE] = input_tokens + output_tokens
     return events
 
 
@@ -137,7 +178,12 @@ def load_events_from_source(path: Path | None, input_format: str) -> List[dict]:
 
 
 def _summarize_events(events: Iterable[Mapping]) -> dict:
-    totals: dict[str, Any] = {"total_events": 0, "total_tokens": 0}
+    totals: dict[str, Any] = {
+        "total_events": 0,
+        "total_tokens": 0,
+        "total_input_tokens": 0,
+        "total_output_tokens": 0,
+    }
     per_skill: dict[str, dict[str, Any]] = {}
     for event in events:
         totals["total_events"] += 1
@@ -151,6 +197,10 @@ def _summarize_events(events: Iterable[Mapping]) -> dict:
                 "policy_required": 0,
                 "tokens": 0,
                 "token_samples": 0,
+                "tokens_input": 0,
+                "tokens_output": 0,
+                "tokens_input_samples": 0,
+                "tokens_output_samples": 0,
                 "files": set(),
                 "models": set(),
                 "progressive_levels": set(),
@@ -159,7 +209,7 @@ def _summarize_events(events: Iterable[Mapping]) -> dict:
         skill_entry["events"] += 1
 
         event_name = str(event.get("event", ""))
-        if event_name.startswith("end") or event_name == "anthropic_call":
+        if event_name.startswith("end") or event_name in {"anthropic_call", "span"}:
             skill_entry["completions"] += 1
         if attrs.get("skill.policy_required"):
             skill_entry["policy_required"] += 1
@@ -168,14 +218,30 @@ def _summarize_events(events: Iterable[Mapping]) -> dict:
             skill_entry["files"].update(files)
         if attrs.get("skill.progressive_level"):
             skill_entry["progressive_levels"].add(str(attrs["skill.progressive_level"]))
-        if attrs.get(GENAI_TOKEN_USAGE) is not None:
-            try:
-                tokens = int(attrs[GENAI_TOKEN_USAGE])
-            except (TypeError, ValueError):
-                tokens = 0
-            skill_entry["tokens"] += tokens
-            skill_entry["token_samples"] += 1
-            totals["total_tokens"] += tokens
+        if event_name != "start":
+            input_present = GENAI_USAGE_INPUT in attrs
+            output_present = GENAI_USAGE_OUTPUT in attrs
+            if input_present:
+                input_tokens = _safe_int(attrs.get(GENAI_USAGE_INPUT)) or 0
+                skill_entry["tokens_input"] += input_tokens
+                skill_entry["tokens_input_samples"] += 1
+                totals["total_input_tokens"] += input_tokens
+            if output_present:
+                output_tokens = _safe_int(attrs.get(GENAI_USAGE_OUTPUT)) or 0
+                skill_entry["tokens_output"] += output_tokens
+                skill_entry["tokens_output_samples"] += 1
+                totals["total_output_tokens"] += output_tokens
+
+            if input_present or output_present:
+                total_tokens = (input_tokens if input_present else 0) + (output_tokens if output_present else 0)
+                skill_entry["tokens"] += total_tokens
+                skill_entry["token_samples"] += 1
+                totals["total_tokens"] += total_tokens
+            elif attrs.get(GENAI_TOKEN_USAGE) is not None:
+                legacy_tokens = _safe_int(attrs.get(GENAI_TOKEN_USAGE)) or 0
+                skill_entry["tokens"] += legacy_tokens
+                skill_entry["token_samples"] += 1
+                totals["total_tokens"] += legacy_tokens
         model = attrs.get(GENAI_MODEL)
         if model:
             skill_entry["models"].add(str(model))
@@ -185,6 +251,12 @@ def _summarize_events(events: Iterable[Mapping]) -> dict:
         calls = data["completions"] or data["events"]
         policy_required = min(data["policy_required"], calls)
         avg_tokens = data["tokens"] / data["token_samples"] if data["token_samples"] else 0.0
+        avg_input_tokens = (
+            data["tokens_input"] / data["tokens_input_samples"] if data["tokens_input_samples"] else 0.0
+        )
+        avg_output_tokens = (
+            data["tokens_output"] / data["tokens_output_samples"] if data["tokens_output_samples"] else 0.0
+        )
         policy_rate = (policy_required / calls) if calls else 0.0
         skills_summary[skill] = {
             "events": data["events"],
@@ -192,7 +264,11 @@ def _summarize_events(events: Iterable[Mapping]) -> dict:
             "policy_required": policy_required,
             "policy_rate": policy_rate,
             "tokens_total": data["tokens"],
+            "tokens_input_total": data["tokens_input"],
+            "tokens_output_total": data["tokens_output"],
             "tokens_average": avg_tokens,
+            "tokens_input_average": avg_input_tokens,
+            "tokens_output_average": avg_output_tokens,
             "files": sorted(data["files"])[:10],
             "models": sorted(data["models"]),
             "progressive_levels": sorted(data["progressive_levels"]),
@@ -212,7 +288,11 @@ def _format_summary_table(summary: dict) -> str:
     lines.append("=" * 18)
     lines.append(f"Total events: {summary['total_events']}")
     lines.append(f"Skills observed: {summary['total_skills']}")
-    lines.append(f"Recorded tokens: {summary['total_tokens']}")
+    lines.append(
+        "Recorded tokens: "
+        f"{summary['total_tokens']} (input {summary.get('total_input_tokens', 0)}, "
+        f"output {summary.get('total_output_tokens', 0)})"
+    )
     lines.append("")
     header = f"{'Skill':32} {'Calls':>7} {'Avg Tokens':>11} {'Policy %':>9} {'Top Files':<30} {'Models':<20}"
     lines.append(header)
@@ -288,11 +368,54 @@ def cmd_demo(_: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_discover(args: argparse.Namespace) -> int:
+    skills, problems = discover_skills(args.paths)
+    if args.format == "xml":
+        print(skills_to_prompt_xml(skills, include_location=not args.omit_location))
+    else:
+        payload = [skill.to_dict() for skill in skills]
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
+
+    if problems:
+        for problem in problems:
+            print(f"[skillscope] {problem.path}", file=sys.stderr)
+            for message in problem.errors:
+                print(f"  - {message}", file=sys.stderr)
+        if args.strict:
+            return 1
+    return 0
+
+
+def cmd_validate(args: argparse.Namespace) -> int:
+    skill_dirs = collect_skill_dirs(args.paths)
+    if not skill_dirs:
+        print("[skillscope] no skills found in provided paths", file=sys.stderr)
+        return 1
+
+    problems: list[SkillProblem] = []
+    for skill_dir in skill_dirs:
+        errors = validate_skill_dir(skill_dir)
+        if errors:
+            problems.append(SkillProblem(path=skill_dir, errors=errors))
+
+    if args.format == "json":
+        print(problems_to_json(problems))
+    else:
+        for problem in problems:
+            print(f"[skillscope] {problem.path}", file=sys.stderr)
+            for message in problem.errors:
+                print(f"  - {message}", file=sys.stderr)
+
+    return 1 if problems else 0
+
+
 def _prepare_summary_for_json(summary: dict) -> dict:
     exportable = {
         "total_events": summary.get("total_events", 0),
         "total_skills": summary.get("total_skills", 0),
         "total_tokens": summary.get("total_tokens", 0),
+        "total_input_tokens": summary.get("total_input_tokens", 0),
+        "total_output_tokens": summary.get("total_output_tokens", 0),
         "skills": [],
     }
     for skill, data in sorted(summary.get("skills", {}).items(), key=lambda item: item[0].lower()):
@@ -351,6 +474,48 @@ def build_parser() -> argparse.ArgumentParser:
 
     demo_parser = subparsers.add_parser("demo", help="Show demo skill documentation.")
     demo_parser.set_defaults(func=cmd_demo)
+
+    discover_parser = subparsers.add_parser(
+        "discover", help="Discover skills and emit metadata or prompt XML."
+    )
+    discover_parser.add_argument(
+        "paths",
+        nargs="+",
+        help="Paths to skill directories or parent folders.",
+    )
+    discover_parser.add_argument(
+        "--format",
+        choices=("json", "xml"),
+        default="json",
+        help="Output format for discovered skills.",
+    )
+    discover_parser.add_argument(
+        "--omit-location",
+        action="store_true",
+        help="Omit <location> entries when emitting XML.",
+    )
+    discover_parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Exit non-zero if any skills fail to parse.",
+    )
+    discover_parser.set_defaults(func=cmd_discover)
+
+    validate_parser = subparsers.add_parser(
+        "validate", help="Validate skills against the Agent Skills spec."
+    )
+    validate_parser.add_argument(
+        "paths",
+        nargs="+",
+        help="Paths to skill directories or parent folders.",
+    )
+    validate_parser.add_argument(
+        "--format",
+        choices=("text", "json"),
+        default="text",
+        help="Output format for validation results.",
+    )
+    validate_parser.set_defaults(func=cmd_validate)
 
     analyze_parser = subparsers.add_parser("analyze", help="Summarize skill events for quick reports.")
     analyze_parser.add_argument("path", nargs="?", help="Path to events file or directory (defaults to stdin).")

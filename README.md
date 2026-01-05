@@ -1,6 +1,6 @@
-# SkillScope — OpenTelemetry for Claude Skills (research-only)
+# SkillScope — OpenTelemetry for Agent Skills (research-only)
 
-SkillScope adds observability to Anthropic *Skills* so you can see which Skill was intended, which files were referenced, whether policy approval was required, and how tokens or latency shifted. Everything here is non-commercial, vendor-neutral, and driven by publicly available Anthropic and OpenTelemetry standards.
+SkillScope adds observability to the open Agent Skills standard so you can see which Skill was intended, which files were referenced, whether policy approval was required, and how tokens or latency shifted. Everything here is non-commercial, vendor-neutral, and driven by the Agent Skills specification plus OpenTelemetry conventions.
 
 ## At a glance
 
@@ -21,7 +21,7 @@ SkillScope adds observability to Anthropic *Skills* so you can see which Skill w
 git clone https://github.com/skillscope/skillscope.git
 cd skillscope
 python -m pip install -e .[dev]
-export SKILLSCOPE_CAPTURE=1     # optional JSON capture per Anthropic call
+export SKILLSCOPE_CAPTURE=1     # optional JSON capture per provider call
 python examples/run_with_skill.py
 skillscope emit --demo          # emits synthetic spans/events to stdout
 ```
@@ -41,14 +41,17 @@ See the OpenTelemetry GenAI & Agent specs for details.
 ## Core features
 
 - **Instrumentation helpers**
-  - `use_skill`, `use_skill_async`, and `with_skill` decorator wrap Skill-aware sections while handling context propagation.
+  - `use_skill`, `use_skill_async`, `use_skill_from_path`, and `with_skill` wrap Skill-aware sections while handling context propagation.
   - `gather_with_skill` keeps spans intact across concurrent `asyncio.gather`.
-  - `AnthropicInstrumented` attaches `skill.*` and `skillscope.*` metadata, records JSON events when `SKILLSCOPE_CAPTURE=1`, and estimates token usage if the SDK is unavailable.
+  - `use_tool` and `run_skill_script` record tool/script executions with GenAI tool attributes.
+  - Provider wrappers (for example, `AnthropicInstrumented`) attach `skill.*` and `skillscope.*` metadata, record JSON events when `SKILLSCOPE_CAPTURE=1`, and estimate token usage if the SDK is unavailable.
 - **CLI workflows**
-  - `skillscope emit` normalizes JSON/JSONL/Anthropic conversation logs into OpenTelemetry-style events and forwards them through exporters.
+  - `skillscope emit` normalizes JSON/JSONL/provider conversation logs (including Anthropic) into OpenTelemetry-style events and forwards them through exporters.
   - `skillscope ingest` batches and re-exports existing logs to NDJSON or OTLP.
   - `skillscope analyze` produces human-friendly tables or JSON summaries (great for product reviews or weekly reports).
   - `skillscope demo` previews the bundled Brand Voice Skill content.
+  - `skillscope discover` emits Skill metadata or `<available_skills>` XML for prompts.
+  - `skillscope validate` checks SKILL.md frontmatter against the Agent Skills spec.
 - **Exporters**
   - NDJSON for quick inspection (stdout or file).
   - OTLP via a lightweight HTTP client or the real OpenTelemetry SDK when optional extras are installed.
@@ -65,7 +68,8 @@ See the OpenTelemetry GenAI & Agent specs for details.
 ## Telemetry scope
 
 - When provider SDKs do not expose token metrics, SkillScope uses a heuristic estimator. Prefer native provider token usage fields whenever they are available.
-- The auxiliary `skillscope.*` attributes intentionally avoid collisions with `gen_ai.*` and `gen_ai.agent.*` keys while semantic conventions continue to stabilize.
+- SkillScope emits `gen_ai.usage.input_tokens` and `gen_ai.usage.output_tokens` when available, plus `gen_ai.client.token.usage` for metrics compatibility.
+- The auxiliary `skillscope.*` attributes intentionally avoid collisions with `gen_ai.*` keys while semantic conventions continue to stabilize.
 
 ## CLI cheatsheet
 
@@ -75,12 +79,14 @@ See the OpenTelemetry GenAI & Agent specs for details.
 | `skillscope ingest path/to/logs --to otlp` | Re-export JSON/JSONL logs to OTLP or NDJSON | Works with files or directories |
 | `skillscope analyze path/to/logs` | Summarize Skill activity for stakeholders | `--format json` for automation; add `--demo` to preview |
 | `skillscope demo` | Show bundled Skill documentation | Uses safe synthetic content |
+| `skillscope discover ./skills` | List skills or emit `<available_skills>` XML | Use `--format xml` for prompt blocks |
+| `skillscope validate ./skills` | Validate SKILL.md frontmatter | `--format json` for automation |
 
 ## Environment variables
 
 | Variable | Meaning |
 | --- | --- |
-| `SKILLSCOPE_CAPTURE` | When set to `1`, print compact JSON events for every Anthropic client call |
+| `SKILLSCOPE_CAPTURE` | When set to `1`, print compact JSON events for every provider client call |
 | `SKILLSCOPE_EXPORT_NDJSON` | `0` disables NDJSON output; `SKILLSCOPE_EXPORT_NDJSON_PATH` writes to a file |
 | `SKILLSCOPE_EXPORT_OTLP` | `1` enables OTLP exporters; respects `SKILLSCOPE_OTLP_ENDPOINT` / `OTEL_EXPORTER_OTLP_ENDPOINT` |
 | `SKILLSCOPE_EXPORT_NDJSON_PATH` | File path for persisted NDJSON lines |
@@ -105,19 +111,19 @@ Import the Grafana dashboard (`dashboards/grafana_skillscope.json`) and point it
 
 ## For engineers
 
-- Add instrumentation by wrapping Skill-bound sections with `use_skill`/`with_skill`. See concrete examples in [docs/workflows.md](docs/workflows.md).
+- Add instrumentation by wrapping Skill-bound sections with `use_skill`/`with_skill` or `use_skill_from_path`. See concrete examples in [docs/workflows.md](docs/workflows.md).
 - When the Anthropic Python SDK is available, `AnthropicInstrumented` will forward requests while injecting metadata; otherwise, it returns a mock preview plus estimated token usage so tests stay deterministic.
 - Configure exporters using environment variables (`SKILLSCOPE_EXPORT_OTLP=1`) and optional extras (`pip install skillscope[otlp]`) to stream spans straight into your collector.
 
 ## Limitations
 
-Claude’s native Skills telemetry isn’t exposed via API today; SkillScope annotates your own calls and harnesses. Treat it as developer-side instrumentation, not a reverse-engineering tool. For canonical behavior, always refer to Anthropic’s documentation. ([Claude Docs][3])
+Provider-native Skill telemetry is not generally exposed today; SkillScope annotates your own calls and harnesses. Treat it as developer-side instrumentation, not a reverse-engineering tool. For canonical behavior, always refer to the Agent Skills spec and provider documentation.
 
 ## References
 
+- Agent Skills specification ([Agent Skills][4])
+- Agent Skills reference library (`skills-ref`) ([GitHub][6])
 - Anthropic announcement & engineering deep-dive on Skills ([Anthropic][1])
-- Anthropic Help Center — creating & using Skills
-- Claude Code Skills guide
 - Anthropic public Skills examples and templates ([GitHub][5])
 - OpenTelemetry GenAI & Agent semantic conventions ([OpenTelemetry][2])
 
@@ -131,5 +137,6 @@ For vulnerability disclosures, follow the guidance in [SECURITY.md](SECURITY.md)
 
 [1]: https://www.anthropic.com/news/claude-team-skills
 [2]: https://opentelemetry.io/docs/specs/semconv/gen-ai/
-[3]: https://docs.anthropic.com/
 [5]: https://github.com/anthropics/skills
+[4]: https://agentskills.io/specification
+[6]: https://github.com/agentskills/agentskills/tree/main/skills-ref

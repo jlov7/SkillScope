@@ -5,10 +5,13 @@ from pathlib import Path
 from typing import Dict, List
 
 from .semconv import (
-    AGENT_OPERATION,
     GENAI_MODEL,
+    GENAI_OPERATION,
     GENAI_TOKEN_USAGE,
+    GENAI_USAGE_INPUT,
+    GENAI_USAGE_OUTPUT,
     SKILL_FILES,
+    SKILL_LICENSE,
     SKILL_NAME,
     SKILL_POLICY_REQUIRED,
     SKILL_PROGRESSIVE_LEVEL,
@@ -17,31 +20,42 @@ from .semconv import (
 )
 
 MODULE_ROOT = Path(__file__).resolve().parent.parent
-SKILL_PATH = MODULE_ROOT / "examples" / "skills" / "brand_voice" / "SKILL.md"
-STYLE_GUIDE_PATH = MODULE_ROOT / "examples" / "skills" / "brand_voice" / "style-guide" / "brand-voice.md"
+SKILL_PATH = MODULE_ROOT / "examples" / "skills" / "brand-voice" / "SKILL.md"
+STYLE_GUIDE_PATH = MODULE_ROOT / "examples" / "skills" / "brand-voice" / "style-guide" / "brand-voice.md"
 
 
 def demo_skill_attrs() -> Dict[str, str]:
     return skill_attrs(
         name="Brand Voice Editor (Safe Demo)",
         version="1.0.0",
-        files=["examples/skills/brand_voice/style-guide/brand-voice.md"],
+        description="Rewrite marketing copy into a warm, confident, plain-language tone.",
+        files=["examples/skills/brand-voice/style-guide/brand-voice.md"],
         policy_required=False,
         progressive_level="referenced",
         model="claude-3-5-sonnet",
-        token_usage=321,
-        agent_operation="tool",
+        input_tokens=210,
+        output_tokens=111,
+        operation="invoke_agent",
+        license="Apache-2.0",
     )
 
 
 def demo_skill_events() -> List[Dict]:
     attrs = demo_skill_attrs()
+    start_attrs = dict(attrs)
+    start_attrs[GENAI_USAGE_INPUT] = 0
+    start_attrs[GENAI_USAGE_OUTPUT] = 0
+    start_attrs[GENAI_TOKEN_USAGE] = 0
     return [
-        {"ts": 1718695200.0, "event": "start", "attrs": dict(attrs)},
+        {"ts": 1718695200.0, "event": "start", "attrs": start_attrs},
         {
             "ts": 1718695201.2,
             "event": "end",
-            "attrs": {**attrs, GENAI_TOKEN_USAGE: attrs[GENAI_TOKEN_USAGE]},
+            "attrs": {
+                **attrs,
+                GENAI_USAGE_INPUT: attrs.get(GENAI_USAGE_INPUT, 0),
+                GENAI_USAGE_OUTPUT: attrs.get(GENAI_USAGE_OUTPUT, 0),
+            },
         },
     ]
 
@@ -67,5 +81,6 @@ def attrs_to_summary(attrs: Dict) -> Dict[str, str]:
         "policy_required": attrs.get(SKILL_POLICY_REQUIRED),
         "progressive_level": attrs.get(SKILL_PROGRESSIVE_LEVEL),
         "model": attrs.get(GENAI_MODEL),
-        "agent_operation": attrs.get(AGENT_OPERATION),
+        "operation": attrs.get(GENAI_OPERATION),
+        "license": attrs.get(SKILL_LICENSE),
     }

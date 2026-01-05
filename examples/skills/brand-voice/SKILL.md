@@ -1,3 +1,14 @@
+---
+name: brand-voice
+description: Rewrite marketing copy into a warm, confident, plain-language tone using a static style guide.
+license: Apache-2.0
+compatibility: Works in any skills-compatible agent; no network or external dependencies required.
+metadata:
+  version: "1.0.0"
+  audience: demo
+allowed-tools: Read
+---
+
 # Brand Voice Editor (Safe Demo)
 
 ## Overview
@@ -15,4 +26,3 @@ This skill helps rewrite marketing copy into a warm, confident, and plain-langua
 - Uses a static style guide only; no API calls to external services.
 - No secrets required.
 - Appropriate for demos and testing observability pipelines.
-

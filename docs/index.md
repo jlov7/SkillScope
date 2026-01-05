@@ -1,6 +1,6 @@
 # SkillScope Documentation
 
-Welcome! SkillScope is a research-grade observability toolkit that brings OpenTelemetry semantics to Anthropic Skills. Choose the path that matches your role:
+Welcome! SkillScope is a research-grade observability toolkit that brings OpenTelemetry semantics to Agent Skills. Choose the path that matches your role:
 
 - **Just getting oriented?** Read the [Overview](overview.md) for terminology, context, and project structure.
 - **Shipping instrumentation or wiring telemetry?** Head to [Engineering Workflows](workflows.md) for code examples, exporter configuration, and collector recipes.
@@ -14,6 +14,7 @@ Welcome! SkillScope is a research-grade observability toolkit that brings OpenTe
 - [Grafana Dashboard](../dashboards/grafana_skillscope.json) — import into your observability stack.
 - [Ops Stack](../ops/docker-compose.yaml) — collector + Prometheus + Grafana bundle.
 - [Sample Metrics](../ops/sample_metrics.prom) — seed Prometheus for instant dashboards.
+- [Agent Skills Spec](https://agentskills.io/specification) — format and metadata rules for SKILL.md.
 - [Contributing](../CONTRIBUTING.md) — guidelines if you want to extend SkillScope.
 - [Security Policy](../SECURITY.md) — how to report vulnerabilities.
 

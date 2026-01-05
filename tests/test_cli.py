@@ -6,7 +6,7 @@ from types import SimpleNamespace
 import pytest
 
 from skillscope import __version__
-from skillscope.cli import cmd_analyze, cmd_demo, cmd_emit, cmd_ingest, main
+from skillscope.cli import cmd_analyze, cmd_demo, cmd_discover, cmd_emit, cmd_ingest, cmd_validate, main
 from skillscope.example_data import demo_skill_events
 from skillscope.exporters import HTTPOTLPExporter
 
@@ -57,7 +57,8 @@ def test_analyze_table_output(tmp_path, monkeypatch, capsys):
                     "skill.name": "Analyze Skill",
                     "skill.files": "guide.md",
                     "skill.policy_required": False,
-                    "gen_ai.client.token.usage": 40,
+                    "gen_ai.usage.input_tokens": 25,
+                    "gen_ai.usage.output_tokens": 15,
                     "gen_ai.request.model": "claude",
                 },
             }
@@ -75,7 +76,17 @@ def test_analyze_table_output(tmp_path, monkeypatch, capsys):
 def test_analyze_json_output(tmp_path, capsys):
     events_file = tmp_path / "events.jsonl"
     events_file.write_text(
-        json.dumps({"event": "end", "attrs": {"skill.name": "Analyze Skill", "gen_ai.client.token.usage": 20}}) + "\n",
+        json.dumps(
+            {
+                "event": "end",
+                "attrs": {
+                    "skill.name": "Analyze Skill",
+                    "gen_ai.usage.input_tokens": 12,
+                    "gen_ai.usage.output_tokens": 8,
+                },
+            }
+        )
+        + "\n",
         encoding="utf-8",
     )
     args = SimpleNamespace(path=str(events_file), input_format="auto", format="json")
@@ -83,6 +94,9 @@ def test_analyze_json_output(tmp_path, capsys):
     summary = json.loads(capsys.readouterr().out)
     assert summary["total_events"] == 1
     assert summary["skills"][0]["skill"] == "Analyze Skill"
+    assert summary["skills"][0]["tokens_total"] == 20
+    assert summary["total_input_tokens"] == 12
+    assert summary["total_output_tokens"] == 8
 
 
 def test_analyze_demo(monkeypatch, capsys):
@@ -114,6 +128,8 @@ def test_emit_from_anthropic_log(tmp_path, monkeypatch, capsys):
     assert output_lines
     record = json.loads(output_lines[0])
     assert record["attrs"]["skill.name"] == "Anthropic Skill"
+    assert record["attrs"]["gen_ai.usage.input_tokens"] == 12
+    assert record["attrs"]["gen_ai.usage.output_tokens"] == 4
     assert record["attrs"]["gen_ai.client.token.usage"] == 16
 
 
@@ -175,3 +191,29 @@ def test_cli_version_flag(capsys):
     assert excinfo.value.code == 0
     output = capsys.readouterr().out.strip()
     assert __version__ in output
+
+
+def test_discover_outputs_metadata(tmp_path, capsys):
+    skill_dir = tmp_path / "demo-skill"
+    skill_dir.mkdir()
+    (skill_dir / "SKILL.md").write_text(
+        "---\nname: demo-skill\ndescription: Demo skill\n---\n",
+        encoding="utf-8",
+    )
+    args = SimpleNamespace(paths=[str(skill_dir)], format="json", omit_location=False, strict=False)
+    assert cmd_discover(args) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload[0]["name"] == "demo-skill"
+
+
+def test_validate_reports_errors(tmp_path, capsys):
+    skill_dir = tmp_path / "bad-skill"
+    skill_dir.mkdir()
+    (skill_dir / "SKILL.md").write_text(
+        "---\nname: bad-skill\n---\n",
+        encoding="utf-8",
+    )
+    args = SimpleNamespace(paths=[str(skill_dir)], format="json")
+    assert cmd_validate(args) == 1
+    payload = json.loads(capsys.readouterr().out)
+    assert payload[0]["path"].endswith("bad-skill")

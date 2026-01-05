@@ -22,7 +22,7 @@ client = AnthropicInstrumented()
 with use_skill(
     name="Brand Voice Editor (Safe Demo)",
     version="1.0.0",
-    files=["examples/skills/brand_voice/style-guide/brand-voice.md"],
+    files=["examples/skills/brand-voice/style-guide/brand-voice.md"],
     policy_required=False,
     progressive_level="referenced",
     extra_attrs={"team": "marketing-ai"},
@@ -32,6 +32,20 @@ with use_skill(
         max_tokens=120,
         messages=[{"role": "user", "content": "Rewrite this paragraph in our brand voice."}],
     )
+```
+
+### From SKILL.md frontmatter
+
+```python
+from skillscope.instrumentation import use_skill_from_path
+
+with use_skill_from_path(
+    "examples/skills/brand-voice",
+    files=["examples/skills/brand-voice/style-guide/brand-voice.md"],
+    model="claude-3-5-sonnet",
+    operation="invoke_agent",
+):
+    ...
 ```
 
 ### Decorator
@@ -48,6 +62,17 @@ from skillscope.instrumentation import with_skill
 )
 def review_contract(text: str) -> str:
     ...
+```
+
+### Tool and script execution
+
+```python
+from skillscope.instrumentation import run_skill_script, use_tool
+
+with use_tool(name="vector-search", tool_type="datastore"):
+    ...
+
+run_skill_script("skills/contract_analyzer/scripts/extract.sh", args=["--latest"], check=True)
 ```
 
 ### Async workflows
@@ -96,6 +121,8 @@ SkillScope auto-detects the SDK and sends real spans/metrics through the configu
 - **Emit**: `skillscope emit --input events.jsonl --stdout` — normalize and forward raw logs.
 - **Ingest**: `skillscope ingest ./logs --to otlp` — recursively traverse a directory of JSON/JSONL logs.
 - **Analyze**: `skillscope analyze ./logs --format json` — gather statistics for dashboards or automation.
+- **Discover**: `skillscope discover ./skills` — list skill metadata or emit `<available_skills>` XML.
+- **Validate**: `skillscope validate ./skills` — validate SKILL.md frontmatter against the spec.
 
 All commands accept `--input-format auto|json|jsonl|anthropic`. `auto` inspects the payload and chooses the right parser.
 

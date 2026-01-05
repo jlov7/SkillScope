@@ -4,13 +4,13 @@ This guide is written for product managers, operations partners, and policy team
 
 ## What you get
 
-SkillScope creates a short record every time your team intends to use a Claude Skill. Each record captures:
+SkillScope creates a short record every time your team intends to use an Agent Skill. Each record captures:
 
 - The Skill name and version
 - How many files were loaded
 - Whether policy approval was required
-- Estimated tokens for the request
-- Which Claude model was involved
+- Estimated tokens for the request (input/output totals when available)
+- Which model was involved
 
 You can turn those records into clear summaries with a single command.
 
@@ -31,7 +31,7 @@ You can turn those records into clear summaries with a single command.
    ==================
    Total events: 42
    Skills observed: 3
-   Recorded tokens: 18540
+   Recorded tokens: 18540 (input 11200, output 7340)
 
    Skill                             Calls  Avg Tokens   Policy % Top Files                      Models
    Brand Voice Editor (Safe Demo)        9       312.0        0.0 examples/skills/...            claude-3-5-sonnet
@@ -46,7 +46,7 @@ You can turn those records into clear summaries with a single command.
    skillscope analyze week.jsonl --format json > week-summary.json
    ```
 
-   Upload the JSON into your favorite BI tool or add it to Google Sheets with an importer.
+   Upload the JSON into your favorite BI tool or add it to Google Sheets with an importer. The JSON includes total/input/output token aggregates per skill.
 
 1. **No data yet?** Try `skillscope analyze --demo` to see a sample summary line-up.
 
@@ -71,7 +71,7 @@ If your organization already runs Grafana or another telemetry tool:
 
 ## Glossary
 
-- **Skill**: curated folder of instructions + resources for Claude to follow.
+- **Skill**: curated folder of instructions + resources for agents to follow.
 - **Policy required**: does the Skill require human approval before execution?
 - **Progressive level**: how much of the Skill has been revealed (`metadata`, `referenced`, `eager`).
 - **Tokens**: billing unit for how much text is processed; think approximate word pieces.
