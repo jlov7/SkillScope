@@ -12,7 +12,7 @@
 - [x] Milestone 1: Web UI foundation (Next.js + Tailwind) and app shell
 - [x] Milestone 2: Client-side analysis engine + unit tests
 - [x] Milestone 3: Onboarding, demo flow, help page, and accessibility polish
-- [ ] Milestone 4: CI updates, docs updates, and release validation
+- [x] Milestone 4: CI updates, docs updates, and release validation
 
 ## Surprises & Discoveries
 
@@ -30,9 +30,16 @@
 ## Outcomes & Retrospective
 
 - Completed:
+  - Static web UI shipped with onboarding, analysis, demo, and help flows.
+  - Client-side parser/summarizer shipped with unit tests.
+  - CI expanded to include web lint/test/build/e2e plus Python quality gates.
+  - Docs and steering files completed for release operations.
 - Deferred:
+  - None in the current v1 plan.
 - Risks left:
+  - Playwright browser install time can vary on CI runners.
 - Follow-ups:
+  - Optional: add artifact caching to optimize CI duration.
 
 ## Verification Evidence
 

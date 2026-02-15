@@ -10,7 +10,7 @@
 
 - [x] Tests exist for critical logic and key UI flows.
 - [x] Lint, typecheck, and build pass.
-- [ ] CI is green.
+- [x] CI is green.
 
 ## Accessibility
 
