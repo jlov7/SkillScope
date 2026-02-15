@@ -4,7 +4,7 @@ Build a world-class demo and adoption funnel: guided Studio walkthrough, start/w
 
 ## Status
 
-In Progress (final release sync)
+Completed
 
 ## Plan
 
@@ -14,8 +14,8 @@ In Progress (final release sync)
 1. [x] Update navigation and onboarding calls to action
 1. [x] Publish docs for explainers and presenter demo scripts
 1. [x] Extend e2e tests for new user journeys
-1. [ ] Run full quality gates and push
-1. [ ] Verify CI + Vercel production
+1. [x] Run full quality gates and push
+1. [x] Verify CI + Vercel production
 
 ## Files Expected To Change
 

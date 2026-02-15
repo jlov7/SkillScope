@@ -26,7 +26,7 @@
 - [x] Update `docs/index.md` and `README.md` with clearer access and explanation pathways
 - [x] Extend Playwright tests for new critical pages + guided demo deep link
 - [x] Run full checks (Python + web + e2e + docs formatting)
-- [ ] Push and verify CI + Vercel production readiness
+- [x] Push and verify CI + Vercel production readiness
 
 ## Surprises & Discoveries
 
@@ -61,6 +61,10 @@
   - `uv run mypy skillscope`
   - `cd web && pnpm lint && pnpm test && pnpm build && pnpm e2e`
 - Result: local checks passing.
+- Remote verification:
+  - GitHub Actions (green): https://github.com/jlov7/SkillScope/actions/runs/22040288100
+  - Vercel production deployment (ready): https://skillscope-amber.vercel.app
+  - Validated routes: `/`, `/start`, `/why`, `/demo-kit`, `/studio?demo=1&guide=1`
 
 ______________________________________________________________________
 
