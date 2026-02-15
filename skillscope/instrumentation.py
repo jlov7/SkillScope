@@ -14,17 +14,17 @@ from typing import Any, Callable, Dict, Iterable, Iterator, Optional, TypeVar
 from .example_data import attrs_to_summary
 from .semconv import (
     DEFAULT_PROGRESSIVE_LEVEL,
-    GENAI_OPERATION,
     GENAI_MODEL,
+    GENAI_OPERATION,
     GENAI_TOKEN_USAGE,
-    GENAI_USAGE_INPUT,
-    GENAI_USAGE_OUTPUT,
     GENAI_TOOL_CALL_ARGUMENTS,
     GENAI_TOOL_CALL_ID,
     GENAI_TOOL_CALL_RESULT,
     GENAI_TOOL_DESCRIPTION,
     GENAI_TOOL_NAME,
     GENAI_TOOL_TYPE,
+    GENAI_USAGE_INPUT,
+    GENAI_USAGE_OUTPUT,
     skill_attrs,
 )
 from .skills import read_skill_metadata

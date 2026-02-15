@@ -6,7 +6,15 @@ from types import SimpleNamespace
 import pytest
 
 from skillscope import __version__
-from skillscope.cli import cmd_analyze, cmd_demo, cmd_discover, cmd_emit, cmd_ingest, cmd_validate, main
+from skillscope.cli import (
+    cmd_analyze,
+    cmd_demo,
+    cmd_discover,
+    cmd_emit,
+    cmd_ingest,
+    cmd_validate,
+    main,
+)
 from skillscope.example_data import demo_skill_events
 from skillscope.exporters import HTTPOTLPExporter
 

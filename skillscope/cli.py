@@ -4,7 +4,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any, Iterable, Iterator, List, Mapping, Sequence
+from typing import Any, Iterable, Iterator, List, Mapping, Optional, Sequence
 
 from . import __version__
 from .example_data import demo_skill_events, load_demo_skill_summary

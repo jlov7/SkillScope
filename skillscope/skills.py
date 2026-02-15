@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 import json
+import unicodedata
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterable, Optional
-import unicodedata
 from xml.sax.saxutils import escape
-
 
 try:  # Prefer strict YAML parsing when available.
     import strictyaml  # type: ignore
@@ -48,7 +47,7 @@ class SkillMetadata:
     metadata: dict[str, str] = field(default_factory=dict)
 
     def to_dict(self) -> dict:
-        payload = {
+        payload: dict[str, object] = {
             "name": self.name,
             "description": self.description,
             "path": str(self.path),

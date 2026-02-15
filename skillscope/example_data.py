@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Dict, List
+from typing import Any, Dict, List
 
 from .semconv import (
     GENAI_MODEL,
@@ -24,7 +24,7 @@ SKILL_PATH = MODULE_ROOT / "examples" / "skills" / "brand-voice" / "SKILL.md"
 STYLE_GUIDE_PATH = MODULE_ROOT / "examples" / "skills" / "brand-voice" / "style-guide" / "brand-voice.md"
 
 
-def demo_skill_attrs() -> Dict[str, str]:
+def demo_skill_attrs() -> Dict[str, Any]:
     return skill_attrs(
         name="Brand Voice Editor (Safe Demo)",
         version="1.0.0",
