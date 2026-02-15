@@ -9,9 +9,9 @@
 ## Progress
 
 - [x] Milestone 0: Repo steering files + release checklist + ExecPlan
-- [ ] Milestone 1: Web UI foundation (Next.js + Tailwind) and app shell
-- [ ] Milestone 2: Client-side analysis engine + unit tests
-- [ ] Milestone 3: Onboarding, demo flow, help page, and accessibility polish
+- [x] Milestone 1: Web UI foundation (Next.js + Tailwind) and app shell
+- [x] Milestone 2: Client-side analysis engine + unit tests
+- [x] Milestone 3: Onboarding, demo flow, help page, and accessibility polish
 - [ ] Milestone 4: CI updates, docs updates, and release validation
 
 ## Surprises & Discoveries
@@ -37,5 +37,15 @@
 ## Verification Evidence
 
 - Commands run:
+  - `uv sync --all-extras`
+  - `uv run pytest`
+  - `uv run ruff check .`
+  - `uv run mypy skillscope`
+  - `pnpm lint`
+  - `pnpm test`
+  - `pnpm build` (warning about Next.js workspace root)
+  - `pnpm e2e`
 - Tests run:
-- Manual checks:
+  - Python: 36 passed
+  - Web: Vitest (2), Playwright (2)
+- Manual checks: Not run

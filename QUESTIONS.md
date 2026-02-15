@@ -6,6 +6,7 @@
 - Preferred brand assets (logo, color palette, type choices) for the web UI.
 - Maximum upload size and supported formats beyond JSON/JSONL/Anthropic JSON.
 - Whether to publish a public demo URL or keep the Vercel deployment private.
+- Whether to set `turbopack.root` in `web/next.config.ts` to silence lockfile warnings in Next.js builds.
 
 ## Notes
 
