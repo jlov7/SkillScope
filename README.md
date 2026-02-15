@@ -28,6 +28,40 @@ skillscope emit --demo          # emits synthetic spans/events to stdout
 
 You can then import `dashboards/grafana_skillscope.json` into Grafana (backed by Prometheus/OTLP) or run the bundled collector stack (see below). CI parity lives in `.github/workflows/ci.yml`, which runs ruff, mypy, pytest, and demo artefact generation.
 
+## Web UI (local)
+
+The web UI is static and runs entirely in your browser. It does not upload data.
+
+```bash
+cd web
+pnpm install
+pnpm dev
+```
+
+Open `http://localhost:3000` and upload JSON/JSONL from `skillscope emit` or `skillscope ingest`.
+
+### Web UI quality gates
+
+```bash
+pnpm lint
+pnpm test
+pnpm e2e
+pnpm build
+```
+
+## Development (Python)
+
+```bash
+uv sync --all-extras
+uv run pytest
+uv run ruff check .
+uv run mypy skillscope
+```
+
+## Deploy (Vercel)
+
+Set the project root to `web/`, run `pnpm build`, and set the output directory to `out`. The site is a static export (no backend required).
+
 ### Semantic conventions
 
 GenAI and Agent semantic conventions continue to evolve. To opt into the current stable set, export:
@@ -90,6 +124,8 @@ See the OpenTelemetry GenAI & Agent specs for details.
 | `SKILLSCOPE_EXPORT_NDJSON` | `0` disables NDJSON output; `SKILLSCOPE_EXPORT_NDJSON_PATH` writes to a file |
 | `SKILLSCOPE_EXPORT_OTLP` | `1` enables OTLP exporters; respects `SKILLSCOPE_OTLP_ENDPOINT` / `OTEL_EXPORTER_OTLP_ENDPOINT` |
 | `SKILLSCOPE_EXPORT_NDJSON_PATH` | File path for persisted NDJSON lines |
+
+The web UI has no required environment variables by default.
 
 ## Observability stack demo
 

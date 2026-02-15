@@ -11,6 +11,7 @@ Welcome! SkillScope is a research-grade observability toolkit that brings OpenTe
 ## Quick links
 
 - [README](../README.md) — high-level pitch, quickstart, and CLI cheatsheet.
+- [Web UI Help](help.md) — local UI setup and demo flow.
 - [Grafana Dashboard](../dashboards/grafana_skillscope.json) — import into your observability stack.
 - [Ops Stack](../ops/docker-compose.yaml) — collector + Prometheus + Grafana bundle.
 - [Sample Metrics](../ops/sample_metrics.prom) — seed Prometheus for instant dashboards.
