@@ -1,3 +1,69 @@
+# Demo-First Adoption Funnel
+
+## Purpose / Big Picture
+
+- Make SkillScope instantly understandable, easy to try, and memorable in live demos.
+- Deliver a polished “try -> understand -> explain -> present” journey for both non-technical and technical audiences.
+- Keep everything research-only in positioning while production-grade in execution quality.
+
+## Progress
+
+- [x] Milestone 0: Planning and journey definition
+- [x] Milestone 1: Guided Studio demo mode (deep-link + walkthrough)
+- [x] Milestone 2: New Start/Why/Demo Kit UX routes
+- [x] Milestone 3: Public documentation for technical and non-technical articulation
+- [x] Milestone 4: E2E + quality gates + deployment verification
+
+## Checklist
+
+- [x] Add one-click deep-link demo mode in Studio (`/studio?demo=1&guide=1`)
+- [x] Add guided walkthrough controls and presenter-friendly cues in Studio
+- [x] Add “Start” page for 60-second try path
+- [x] Add “Why” page with technical/non-technical explanation modes
+- [x] Add “Demo Kit” page with short, medium, and deep scripts + fallback plan
+- [x] Update global navigation and home onboarding CTAs to funnel users into Start + Studio
+- [x] Add docs: `docs/demo-kit.md` and `docs/explainers.md`
+- [x] Update `docs/index.md` and `README.md` with clearer access and explanation pathways
+- [x] Extend Playwright tests for new critical pages + guided demo deep link
+- [x] Run full checks (Python + web + e2e + docs formatting)
+- [ ] Push and verify CI + Vercel production readiness
+
+## Surprises & Discoveries
+
+- Date: 2026-02-15
+  Discovery: Existing Studio logic already supports auto-filled demo data paths with minimal extension.
+  Impact: Guided demo mode can be layered in without backend or data model changes.
+- Date: 2026-02-15
+  Discovery: Environment-specific ESLint directory scanning can fail when generated folders are absent.
+  Impact: Lint command is now explicit (`eslint src tests ...`) for deterministic behavior.
+
+## Decision Log
+
+- Date: 2026-02-15
+  Decision: Use in-app routes (`/start`, `/why`, `/demo-kit`) plus docs pages rather than external slideware.
+  Rationale: Keeps the full story reproducible by any visitor from the public repo and deployed app.
+  Alternatives considered: separate presentation repo / exported deck.
+
+## Outcomes & Retrospective
+
+- Completed:
+  - Guided Studio presenter mode with shareable deep-link demo.
+  - New adoption routes: `/start`, `/why`, `/demo-kit`.
+  - New explainer and demo-kit docs with audience-specific messaging.
+  - Expanded e2e journeys covering new routes and guided demo deep-link.
+
+## Verification Evidence
+
+- Commands run:
+  - `uv run mdformat README.md docs/*.md docs/plans/*.md web/README.md .codex/PLANS.md .codex/SCRATCHPAD.md PLANS.md`
+  - `uv run pytest`
+  - `uv run ruff check .`
+  - `uv run mypy skillscope`
+  - `cd web && pnpm lint && pnpm test && pnpm build && pnpm e2e`
+- Result: local checks passing.
+
+______________________________________________________________________
+
 # Replay + Compare Studio
 
 ## Purpose / Big Picture
@@ -83,7 +149,7 @@
   - GitHub Actions: https://github.com/jlov7/SkillScope/actions/runs/22039846344
   - Vercel production: https://skillscope-amber.vercel.app/studio
 
----
+______________________________________________________________________
 
 # Release-ready v1 (Completed)
 

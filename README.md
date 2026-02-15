@@ -20,6 +20,13 @@ It is not sponsored by, affiliated with, or endorsed by my employer, and it does
 - Observability background + glossary: read [docs/overview.md](docs/overview.md).
 - Browse everything: [docs/index.md](docs/index.md).
 
+## Try it now (public demo)
+
+- Fastest first-run: <https://skillscope-amber.vercel.app/start>
+- Guided Studio demo: <https://skillscope-amber.vercel.app/studio?demo=1&guide=1>
+- Why page (technical and non-technical views): <https://skillscope-amber.vercel.app/why>
+- Demo kit page: <https://skillscope-amber.vercel.app/demo-kit>
+
 ## Quickstart (2 minutes)
 
 ```bash
@@ -56,6 +63,20 @@ Use `http://localhost:3000/studio` to compare a known-good baseline run with a c
 1. Review metric deltas, skill-level regressions, and likely root-cause recommendations.
 
 The Studio page also includes a built-in demo dataset for instant walkthroughs.
+
+### Demo and explanation funnel
+
+Use these pages for onboarding and live presentations:
+
+- `/start` — 60-second first-run journey.
+- `/studio?demo=1&guide=1` — guided baseline-vs-current walkthrough.
+- `/why` — switch between non-technical and technical explanation modes.
+- `/demo-kit` — presenter scripts and fallback plan.
+
+Supporting docs:
+
+- [docs/explainers.md](docs/explainers.md)
+- [docs/demo-kit.md](docs/demo-kit.md)
 
 ### Web UI quality gates
 

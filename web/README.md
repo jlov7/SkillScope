@@ -14,8 +14,11 @@ Open <http://localhost:3000>.
 ## Main routes
 
 - `/` Home and onboarding
+- `/start` 60-second first-run flow
+- `/why` technical and non-technical explanation modes
 - `/analyze` single-run summary analysis
 - `/studio` Replay + Compare Studio (baseline vs current)
+- `/demo-kit` presenter scripts and fallback plan
 - `/demo` built-in sample summary
 - `/help` quick usage guidance
 
