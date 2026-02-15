@@ -18,3 +18,4 @@ web/out/
 web/.vercel/
 web/test-results/
 web/playwright-report/
+.vercel
