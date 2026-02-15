@@ -2,6 +2,11 @@
 
 SkillScope adds observability to the open Agent Skills standard so you can see which Skill was intended, which files were referenced, whether policy approval was required, and how tokens or latency shifted. Everything here is non-commercial, vendor-neutral, and driven by the Agent Skills specification plus OpenTelemetry conventions.
 
+## Independent research disclaimer
+
+This repository is a personal research-and-development passion project built in an individual capacity.
+It is not sponsored by, affiliated with, or endorsed by my employer, and it does not represent my employer's views, positions, or policies.
+
 ## At a glance
 
 - **Audience** — Product & operations leads, engineering teams, and observability practitioners who need transparent Skill usage.
@@ -62,7 +67,13 @@ uv run mypy skillscope
 
 ## Deploy (Vercel)
 
-Set the project root to `web/`, run `pnpm build`, and set the output directory to `out`. The site is a static export (no backend required).
+This repo includes a root `vercel.json` that builds and publishes `web/out` directly:
+
+```bash
+vercel --prod
+```
+
+If you prefer Vercel UI settings instead, set project root to `web/`, run `pnpm build`, and set output directory to `out`. The site is a static export (no backend required).
 
 ### Semantic conventions
 
