@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import Link from "next/link";
 
 import Shell from "@/components/Shell";
 import { normalizeEvents, parseInput, summarizeEvents } from "@/lib/analyze";
@@ -14,6 +15,13 @@ export default function DemoPage() {
       <div className="space-y-6">
         <h1 className="text-3xl font-semibold">Demo</h1>
         <p className="text-[var(--muted)]">Sample dataset, analyzed locally in your browser.</p>
+        <p className="text-sm text-[var(--muted)]">
+          For full replay and baseline-vs-current comparison, use{" "}
+          <Link href="/studio" className="underline hover:no-underline">
+            Studio
+          </Link>
+          .
+        </p>
         <pre className="rounded-2xl bg-white border border-[var(--border)] p-4 text-sm overflow-x-auto">
           {JSON.stringify(summary, null, 2)}
         </pre>

@@ -32,6 +32,9 @@ export default function HomePage() {
             <Link href="/analyze" className="px-4 py-2 rounded-full bg-[var(--accent)] text-white">
               Analyze data
             </Link>
+            <Link href="/studio" className="px-4 py-2 rounded-full border border-[var(--border)]">
+              Open Studio
+            </Link>
             <Link
               href="/demo"
               className="px-4 py-2 rounded-full border border-[var(--border)]"
@@ -45,7 +48,8 @@ export default function HomePage() {
           <ol className="space-y-2 text-[var(--muted)]">
             <li>1. Export events via `skillscope emit` or `skillscope ingest`.</li>
             <li>2. Upload JSON/JSONL on the Analyze page.</li>
-            <li>3. Share summaries with your team.</li>
+            <li>3. Use Studio to replay baseline vs current runs.</li>
+            <li>4. Share insights and root-cause notes with your team.</li>
           </ol>
           {!seen && (
             <button

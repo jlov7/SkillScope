@@ -9,6 +9,14 @@ SkillScope is research-only software. The web UI runs locally in your browser an
 1. Visit `http://localhost:3000`
 1. Upload `.json`, `.jsonl`, or `.ndjson` (including Anthropic message JSON payloads)
 
+### Replay + Compare Studio
+
+1. Open `http://localhost:3000/studio`
+1. Upload a baseline run (known-good) and current run (candidate regression)
+1. Use replay controls to step through current execution
+1. Review root-cause insights and skill-level deltas
+1. Use **Load demo runs** for a guided example
+
 ### Limits
 
 - Maximum upload size: `8MB` per file.

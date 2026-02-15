@@ -9,8 +9,8 @@ Status: In Progress
 Deliver a world-class, research-positioned but production-grade Studio experience for:
 
 1. Replay of a single run timeline
-2. Baseline vs current run comparison
-3. Root-cause guidance with actionable recommendations
+1. Baseline vs current run comparison
+1. Root-cause guidance with actionable recommendations
 
 ## Scope
 
@@ -30,9 +30,9 @@ Deliver a world-class, research-positioned but production-grade Studio experienc
 
 - [x] M0: Tracking and execution ledger setup
 - [x] M1: Core replay/compare library implementation
-- [ ] M2: Studio UI and UX implementation
-- [ ] M3: Test expansion (unit + e2e)
-- [ ] M4: Documentation and release verification
+- [x] M2: Studio UI and UX implementation
+- [x] M3: Test expansion (unit + e2e)
+- [x] M4: Documentation and release verification
 
 ## Exhaustive Task Checklist
 
@@ -50,35 +50,35 @@ Deliver a world-class, research-positioned but production-grade Studio experienc
 
 ### M2 UI/UX
 
-- [ ] Add `Studio` route and navigation entrypoint
-- [ ] Add dual upload input with file-size validation
-- [ ] Add demo dataset prefill action
-- [ ] Add replay controls: play, pause, next/prev, scrubber, speed
-- [ ] Add live step detail card
-- [ ] Add overall delta summary cards
-- [ ] Add skill delta/regression table
-- [ ] Add root-cause insight panel
-- [ ] Add failure/empty/help states for each panel
-- [ ] Validate keyboard navigation and focus visibility
+- [x] Add `Studio` route and navigation entrypoint
+- [x] Add dual upload input with file-size validation
+- [x] Add demo dataset prefill action
+- [x] Add replay controls: play, pause, next/prev, scrubber, speed
+- [x] Add live step detail card
+- [x] Add overall delta summary cards
+- [x] Add skill delta/regression table
+- [x] Add root-cause insight panel
+- [x] Add failure/empty/help states for each panel
+- [x] Validate keyboard navigation and focus visibility
 
 ### M3 Tests
 
-- [ ] Extend unit tests for comparison heuristics and edge cases
-- [ ] Add Playwright test for Studio happy path
-- [ ] Add Playwright assertion for compare output visibility
+- [x] Extend unit tests for comparison heuristics and edge cases
+- [x] Add Playwright test for Studio happy path
+- [x] Add Playwright assertion for compare output visibility
 
 ### M4 Docs and release checks
 
-- [ ] Update README with Studio workflow
-- [ ] Update `docs/help.md` with step-by-step Studio usage
-- [ ] Update `docs/faq.md` with comparison/replay FAQs
-- [ ] Run `pnpm lint`
-- [ ] Run `pnpm test`
-- [ ] Run `pnpm build`
-- [ ] Run `pnpm e2e`
-- [ ] Run `uv run pytest`
-- [ ] Run `uv run ruff check .`
-- [ ] Run `uv run mypy skillscope`
+- [x] Update README with Studio workflow
+- [x] Update `docs/help.md` with step-by-step Studio usage
+- [x] Update `docs/faq.md` with comparison/replay FAQs
+- [x] Run `pnpm lint`
+- [x] Run `pnpm test`
+- [x] Run `pnpm build`
+- [x] Run `pnpm e2e`
+- [x] Run `uv run pytest`
+- [x] Run `uv run ruff check .`
+- [x] Run `uv run mypy skillscope`
 
 ## Risks and Mitigations
 
@@ -94,5 +94,5 @@ Deliver a world-class, research-positioned but production-grade Studio experienc
 Work is complete only when:
 
 1. All checklist items are checked.
-2. CI is green on `master`.
-3. Vercel production deployment is `Ready`.
+1. CI is green on `master`.
+1. Vercel production deployment is `Ready`.

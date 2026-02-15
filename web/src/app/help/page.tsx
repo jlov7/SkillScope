@@ -12,6 +12,7 @@ export default function HelpPage() {
         <ul className="list-disc pl-5 text-[var(--muted)]">
           <li>Use `skillscope emit --demo` to generate sample events.</li>
           <li>Upload JSON/JSONL files on the Analyze page.</li>
+          <li>Use Studio to compare baseline vs current runs and replay timeline steps.</li>
           <li>Use the Demo page for a guided preview.</li>
         </ul>
       </div>

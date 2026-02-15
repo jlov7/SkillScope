@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 
 import EmptyState from "@/components/EmptyState";
 import Shell from "@/components/Shell";
@@ -41,6 +42,13 @@ export default function AnalyzePage() {
       <div className="space-y-6">
         <h1 className="text-3xl font-semibold">Analyze your events</h1>
         <p className="text-[var(--muted)]">Client-side analysis only. No data leaves your browser.</p>
+        <p className="text-sm text-[var(--muted)]">
+          Need regression diagnosis?{" "}
+          <Link href="/studio" className="underline hover:no-underline">
+            Open Replay + Compare Studio
+          </Link>
+          .
+        </p>
         <input
           type="file"
           accept=".json,.jsonl,.ndjson"

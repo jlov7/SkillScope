@@ -21,6 +21,9 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             <Link href="/analyze" className="hover:underline">
               Analyze
             </Link>
+            <Link href="/studio" className="hover:underline">
+              Studio
+            </Link>
             <Link href="/demo" className="hover:underline">
               Demo
             </Link>

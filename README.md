@@ -47,6 +47,16 @@ Open `http://localhost:3000` and upload JSON/JSONL from `skillscope emit` or `sk
 Supported inputs: `.json`, `.jsonl`, `.ndjson`, and Anthropic message JSON payloads.
 Current browser-side upload limit: `8MB` per file.
 
+### Replay + Compare Studio
+
+Use `http://localhost:3000/studio` to compare a known-good baseline run with a current run:
+
+1. Upload baseline and current JSON/JSONL files.
+1. Replay the current timeline step-by-step (play, pause, scrub, speed controls).
+1. Review metric deltas, skill-level regressions, and likely root-cause recommendations.
+
+The Studio page also includes a built-in demo dataset for instant walkthroughs.
+
 ### Web UI quality gates
 
 ```bash

@@ -10,9 +10,9 @@
 
 - [x] Milestone 0: Create exhaustive execution tracker + TODO ledger
 - [x] Milestone 1: Build replay/compare analysis engine in `web/src/lib`
-- [ ] Milestone 2: Build Studio UI flow (upload, replay controls, compare insights)
-- [ ] Milestone 3: Add critical tests (unit + e2e) for new behavior
-- [ ] Milestone 4: Update docs/help copy and run full quality gates
+- [x] Milestone 2: Build Studio UI flow (upload, replay controls, compare insights)
+- [x] Milestone 3: Add critical tests (unit + e2e) for new behavior
+- [x] Milestone 4: Update docs/help copy and run full quality gates
 - [ ] Milestone 5: Final release verification + sync
 
 ## Exhaustive TODO Ledger
@@ -27,18 +27,18 @@
 - [x] Add unit tests for timeline reconstruction
 - [x] Add unit tests for diff calculations and percentage math edge cases
 - [x] Add unit tests for heuristic outputs (regression and improvement paths)
-- [ ] Create Studio page with dual upload and explicit error states
-- [ ] Add demo seed pathway for guided exploration
-- [ ] Add replay controls (play/pause, stepper, range scrubber, speed)
-- [ ] Add focused step detail panel (skill/event/model/tokens/latency/status)
-- [ ] Add comparison summary cards and skill delta table
-- [ ] Add root-cause insights panel with severity labels
-- [ ] Add empty/loading/error states for all major panels
-- [ ] Wire navigation + onboarding entrypoints to Studio
-- [ ] Add keyboard-accessible controls and visible focus states
-- [ ] Add/extend Playwright tests for Studio happy path
-- [ ] Update help docs + README flow for Studio usage
-- [ ] Run lint/test/build/e2e and fix all failures
+- [x] Create Studio page with dual upload and explicit error states
+- [x] Add demo seed pathway for guided exploration
+- [x] Add replay controls (play/pause, stepper, range scrubber, speed)
+- [x] Add focused step detail panel (skill/event/model/tokens/latency/status)
+- [x] Add comparison summary cards and skill delta table
+- [x] Add root-cause insights panel with severity labels
+- [x] Add empty/loading/error states for all major panels
+- [x] Wire navigation + onboarding entrypoints to Studio
+- [x] Add keyboard-accessible controls and visible focus states
+- [x] Add/extend Playwright tests for Studio happy path
+- [x] Update help docs + README flow for Studio usage
+- [x] Run lint/test/build/e2e and fix all failures
 - [ ] Commit milestones in reviewable increments
 - [ ] Push and verify CI green
 
@@ -61,10 +61,24 @@
 ## Outcomes & Retrospective
 
 - In progress.
+- Completed so far:
+  - Replay + compare core engine and heuristics.
+  - Studio page with replay controls, root-cause insights, and skill deltas.
+  - Unit and e2e coverage for new critical flow.
+  - Docs updates for README/help/FAQ.
 
 ## Verification Evidence
 
-- Pending for this plan execution.
+- Commands run:
+  - `uv run mdformat README.md docs/help.md docs/faq.md docs/plans/2026-02-15-replay-compare-studio.md`
+  - `uv run pytest`
+  - `uv run ruff check .`
+  - `uv run mypy skillscope`
+  - `pnpm lint`
+  - `pnpm test`
+  - `pnpm build`
+  - `pnpm e2e`
+- Result: all local checks passing.
 
 ---
 

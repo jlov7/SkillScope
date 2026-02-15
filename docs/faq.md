@@ -33,6 +33,12 @@ The `skill.policy_required` attribute is a simple boolean flag set by the develo
 **How do we capture tool or script execution?**\
 Wrap tool calls with `use_tool` or run scripts via `run_skill_script` so SkillScope emits GenAI tool spans alongside the parent Skill.
 
+**How do baseline-vs-current comparisons work in the web UI?**\
+Use the Studio page to upload two runs. SkillScope computes metric deltas (calls/tokens/errors/latency), skill-level regressions, and a likely root-cause summary. This analysis runs entirely in-browser.
+
+**Are root-cause insights deterministic?**\
+They are deterministic rule-based heuristics over your uploaded events, not probabilistic model output. Treat them as triage guidance and verify with timeline replay plus raw event inspection.
+
 **Is there a quick way to demo the dashboards?**\
 Launch the bundled stack in `ops/` and import the Grafana JSON. A sample metrics file (`ops/sample_metrics.prom`) can be loaded into Prometheus for instant visuals.
 

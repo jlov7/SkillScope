@@ -10,10 +10,10 @@ In Progress
 
 1. [x] Create exhaustive execution tracker and TODO ledger
 2. [x] Implement replay/compare core analysis library and tests
-3. [ ] Build Studio UI with onboarding, replay controls, and diff insights
-4. [ ] Add/expand e2e coverage for critical Studio flow
-5. [ ] Update docs/help/README
-6. [ ] Run full quality gates and fix regressions
+3. [x] Build Studio UI with onboarding, replay controls, and diff insights
+4. [x] Add/expand e2e coverage for critical Studio flow
+5. [x] Update docs/help/README
+6. [x] Run full quality gates and fix regressions
 7. [ ] Commit milestones, push, verify CI and deployment
 
 ## Files Expected To Change
