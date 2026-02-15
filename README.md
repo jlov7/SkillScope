@@ -39,6 +39,8 @@ pnpm dev
 ```
 
 Open `http://localhost:3000` and upload JSON/JSONL from `skillscope emit` or `skillscope ingest`.
+Supported inputs: `.json`, `.jsonl`, `.ndjson`, and Anthropic message JSON payloads.
+Current browser-side upload limit: `8MB` per file.
 
 ### Web UI quality gates
 

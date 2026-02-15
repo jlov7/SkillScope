@@ -1,13 +1,13 @@
 # Questions
 
-## Open Decisions
+## Resolved Decisions
 
-- Vercel project name and deployment target (repo root vs `web/` subdirectory).
-- Preferred brand assets (logo, color palette, type choices) for the web UI.
-- Maximum upload size and supported formats beyond JSON/JSONL/Anthropic JSON.
-- Whether to publish a public demo URL or keep the Vercel deployment private.
-- Whether to set `turbopack.root` in `web/next.config.ts` to silence lockfile warnings in Next.js builds.
+- Vercel deployment target: `web/` project root with static export output (`out/`).
+- Visual system: continue the current tokenized palette and typography in the web UI.
+- Upload constraints: keep 8MB max file size and support `json`, `jsonl`, `ndjson`, and Anthropic JSON payloads.
+- Demo publishing: plan for a public demo URL, with no user-upload persistence.
+- Next.js warning handling: set `turbopack.root` to `process.cwd()` in `web/next.config.ts`.
 
 ## Notes
 
-- Baseline `uv run pytest` failed because `pytest` is only in `dev` extras. Will re-run after `uv sync --all-extras`.
+- Python verification requires `uv sync --all-extras` because `pytest` is in optional `dev` extras.
