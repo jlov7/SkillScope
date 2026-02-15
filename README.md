@@ -175,6 +175,6 @@ For vulnerability disclosures, follow the guidance in [SECURITY.md](SECURITY.md)
 
 [1]: https://www.anthropic.com/news/claude-team-skills
 [2]: https://opentelemetry.io/docs/specs/semconv/gen-ai/
-[5]: https://github.com/anthropics/skills
 [4]: https://agentskills.io/specification
+[5]: https://github.com/anthropics/skills
 [6]: https://github.com/agentskills/agentskills/tree/main/skills-ref

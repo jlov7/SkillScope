@@ -8,11 +8,12 @@
 
 **Tech Stack:** Python (uv, pytest, ruff, mypy), Next.js + React + TypeScript + Tailwind, Vitest, Playwright, pnpm, Vercel static deploy.
 
----
+______________________________________________________________________
 
 ### Task 1: Scaffold Web UI (Next.js + Tailwind)
 
 **Files:**
+
 - Create: `web/` (Next.js app)
 - Modify: `web/next.config.js`
 - Modify: `web/package.json`
@@ -22,14 +23,17 @@
 **Step 1: Create app scaffold**
 
 Run:
+
 ```bash
 pnpm create next-app@latest web --ts --tailwind --eslint --app --src-dir --import-alias "@/*"
 ```
+
 Expected: Next.js app created under `web/` with `src/app` layout.
 
 **Step 2: Configure static export**
 
 Edit `web/next.config.js` to:
+
 ```js
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -43,6 +47,7 @@ module.exports = nextConfig;
 **Step 3: Define base layout and fonts**
 
 Update `web/src/app/layout.tsx`:
+
 ```tsx
 import './globals.css';
 import type { Metadata } from 'next';
@@ -68,6 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 **Step 4: Establish global styles**
 
 Replace `web/src/app/globals.css`:
+
 ```css
 @tailwind base;
 @tailwind components;
@@ -107,10 +113,12 @@ h1, h2, h3 {
 **Step 5: Verify web lint**
 
 Run:
+
 ```bash
 cd web
 pnpm lint
 ```
+
 Expected: lint passes.
 
 **Step 6: Commit**
@@ -121,11 +129,12 @@ git add web
 git commit -m "feat: scaffold web ui" -m "Introduce Next.js app scaffold for the v1 UI." -m "" -m "Co-Authored-By: Claude <noreply@anthropic.com>"
 ```
 
----
+______________________________________________________________________
 
 ### Task 2: Implement Client-side Analysis Library (TDD)
 
 **Files:**
+
 - Create: `web/src/lib/analyze.ts`
 - Create: `web/src/lib/analyze.test.ts`
 - Modify: `web/package.json`
@@ -134,6 +143,7 @@ git commit -m "feat: scaffold web ui" -m "Introduce Next.js app scaffold for the
 **Step 1: Write failing tests**
 
 Create `web/src/lib/analyze.test.ts`:
+
 ```ts
 import { describe, expect, it } from 'vitest';
 import { parseInput, summarizeEvents } from './analyze';
@@ -165,11 +175,13 @@ describe('summarizeEvents', () => {
 cd web
 pnpm test
 ```
+
 Expected: FAIL (module not found).
 
 **Step 3: Implement minimal analysis logic**
 
 Create `web/src/lib/analyze.ts`:
+
 ```ts
 export type EventRecord = {
   ts?: number | string;
@@ -415,6 +427,7 @@ export const summarizeEvents = (events: EventRecord[]): Summary => {
 **Step 4: Add Vitest config and scripts**
 
 Create `web/vitest.config.ts`:
+
 ```ts
 import { defineConfig } from 'vitest/config';
 
@@ -427,6 +440,7 @@ export default defineConfig({
 ```
 
 Update `web/package.json` scripts:
+
 ```json
 {
   "scripts": {
@@ -446,6 +460,7 @@ Update `web/package.json` scripts:
 cd web
 pnpm test
 ```
+
 Expected: PASS.
 
 **Step 6: Commit**
@@ -456,11 +471,12 @@ git add web/src/lib web/vitest.config.ts web/package.json
 git commit -m "feat: add client-side analysis engine" -m "Implement event parsing and summaries for in-browser analysis." -m "" -m "Co-Authored-By: Claude <noreply@anthropic.com>"
 ```
 
----
+______________________________________________________________________
 
 ### Task 3: Build Core UI Pages and Onboarding
 
 **Files:**
+
 - Create: `web/src/app/page.tsx`
 - Create: `web/src/app/analyze/page.tsx`
 - Create: `web/src/app/demo/page.tsx`
@@ -470,6 +486,7 @@ git commit -m "feat: add client-side analysis engine" -m "Implement event parsin
 **Step 1: Create shared UI components**
 
 Create `web/src/components/Shell.tsx`:
+
 ```tsx
 import Link from 'next/link';
 
@@ -506,6 +523,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 ```
 
 Create `web/src/components/EmptyState.tsx`:
+
 ```tsx
 export default function EmptyState({ title, body, cta }: { title: string; body: string; cta?: React.ReactNode }) {
   return (
@@ -521,6 +539,7 @@ export default function EmptyState({ title, body, cta }: { title: string; body: 
 **Step 2: Home page with onboarding**
 
 Create `web/src/app/page.tsx`:
+
 ```tsx
 'use client';
 
@@ -577,6 +596,7 @@ export default function HomePage() {
 **Step 3: Analyze page with upload and empty states**
 
 Create `web/src/app/analyze/page.tsx`:
+
 ```tsx
 'use client';
 
@@ -682,6 +702,7 @@ export default function AnalyzePage() {
 **Step 4: Demo and Help pages**
 
 Create `web/src/app/demo/page.tsx`:
+
 ```tsx
 'use client';
 
@@ -708,6 +729,7 @@ export default function DemoPage() {
 ```
 
 Create `web/src/app/help/page.tsx`:
+
 ```tsx
 import Shell from '@/components/Shell';
 
@@ -731,6 +753,7 @@ export default function HelpPage() {
 ```
 
 Create `web/src/lib/demo-data.ts`:
+
 ```ts
 const demoData = `{"event":"start","attrs":{"skill.name":"Brand Voice","gen_ai.usage.input_tokens":0,"gen_ai.usage.output_tokens":0}}\n{"event":"end","attrs":{"skill.name":"Brand Voice","gen_ai.usage.input_tokens":120,"gen_ai.usage.output_tokens":80}}`;
 
@@ -743,6 +766,7 @@ export default demoData;
 cd web
 pnpm build
 ```
+
 Expected: build succeeds.
 
 **Step 6: Commit**
@@ -753,11 +777,12 @@ git add web/src/app web/src/components web/src/lib/demo-data.ts
 git commit -m "feat: add core web ui" -m "Implement onboarding, analyze, demo, and help pages." -m "" -m "Co-Authored-By: Claude <noreply@anthropic.com>"
 ```
 
----
+______________________________________________________________________
 
 ### Task 4: Add UI Tests for Key Flows
 
 **Files:**
+
 - Create: `web/playwright.config.ts`
 - Create: `web/tests/home.spec.ts`
 - Modify: `web/package.json`
@@ -765,6 +790,7 @@ git commit -m "feat: add core web ui" -m "Implement onboarding, analyze, demo, a
 **Step 1: Add Playwright config**
 
 Create `web/playwright.config.ts`:
+
 ```ts
 import { defineConfig } from '@playwright/test';
 
@@ -782,6 +808,7 @@ export default defineConfig({
 **Step 2: Add smoke tests**
 
 Create `web/tests/home.spec.ts`:
+
 ```ts
 import { test, expect } from '@playwright/test';
 
@@ -799,6 +826,7 @@ test('demo loads', async ({ page }) => {
 **Step 3: Add Playwright script**
 
 Update `web/package.json` scripts:
+
 ```json
 {
   "scripts": {
@@ -820,6 +848,7 @@ pnpm exec playwright install
 ```bash
 pnpm e2e
 ```
+
 Expected: PASS.
 
 **Step 6: Commit**
@@ -830,11 +859,12 @@ git add web/playwright.config.ts web/tests web/package.json
 git commit -m "test: add web ui smoke tests" -m "Cover onboarding and demo flows with Playwright." -m "" -m "Co-Authored-By: Claude <noreply@anthropic.com>"
 ```
 
----
+______________________________________________________________________
 
 ### Task 5: Update Docs and README for Web UI
 
 **Files:**
+
 - Modify: `README.md`
 - Create: `docs/help.md`
 - Modify: `docs/index.md`
@@ -842,6 +872,7 @@ git commit -m "test: add web ui smoke tests" -m "Cover onboarding and demo flows
 **Step 1: Add docs/help page**
 
 Create `docs/help.md`:
+
 ```md
 # SkillScope Help
 
@@ -861,6 +892,7 @@ Use `skillscope emit --demo` or `skillscope ingest` to generate events, then upl
 **Step 2: Update docs index**
 
 Add to `docs/index.md`:
+
 ```md
 - Web UI quickstart: [docs/help.md](help.md)
 ```
@@ -877,11 +909,12 @@ git add README.md docs/help.md docs/index.md
 git commit -m "docs: add web ui help" -m "Document local usage and deployment guidance for the UI." -m "" -m "Co-Authored-By: Claude <noreply@anthropic.com>"
 ```
 
----
+______________________________________________________________________
 
 ### Task 6: Update CI for Web + Python
 
 **Files:**
+
 - Modify: `.github/workflows/ci.yml`
 
 **Step 1: Add web jobs**
@@ -900,11 +933,12 @@ git add .github/workflows/ci.yml
 git commit -m "ci: add web ui quality gates" -m "Run web lint/test/build alongside Python checks." -m "" -m "Co-Authored-By: Claude <noreply@anthropic.com>"
 ```
 
----
+______________________________________________________________________
 
 ### Task 7: Release Verification
 
 **Files:**
+
 - Modify: `PLANS.md`
 - Modify: `.codex/PLANS.md`
 - Modify: `RELEASE_CHECKLIST.md`

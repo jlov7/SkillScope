@@ -5,9 +5,9 @@ SkillScope is research-only software. The web UI runs locally in your browser an
 ## Web UI
 
 1. `pnpm install` in `web/`
-2. `pnpm dev`
-3. Visit `http://localhost:3000`
-4. Upload `.json`, `.jsonl`, or `.ndjson` (including Anthropic message JSON payloads)
+1. `pnpm dev`
+1. Visit `http://localhost:3000`
+1. Upload `.json`, `.jsonl`, or `.ndjson` (including Anthropic message JSON payloads)
 
 ### Limits
 

@@ -7,11 +7,12 @@ SkillScope v1 stays publicly positioned as a research-only toolkit, but the prod
 ## 2) Web UI Architecture and Core Flows
 
 The v1 web UI is a static Next.js app deployed to Vercel, with client-side analysis only. This keeps security and deployment risk low while delivering a polished UX. Core flows:
+
 - Onboarding: first-run screen with a short overview, privacy notice, and a “Load demo” or “Upload data” split. Persist a “seen onboarding” flag in localStorage.
 - Analyze: upload JSON/JSONL/Anthropic JSON in-browser, parse, normalize, and summarize, then display KPI cards, skill-level tables, and file/model breakdowns. Provide clear error states with remediation tips.
 - Demo: one-click analysis using bundled sample data (derived from the CLI demo) to showcase dashboards without user data.
 - Help: an embedded help page with minimal docs plus contextual tooltips on the Analyze screen.
-The UI should be structured with a minimal design system: typography scale, color tokens, and reusable components for KPI cards, tables, alerts, and empty states. Avoid unnecessary re-renders by memoizing expensive analysis steps and using file-size limits to protect the browser. Parsing should be robust: support JSON arrays, JSON objects, JSONL, and Anthropic message payloads. Large files should be handled defensively, with a clear size cap and a sample-size warning. The UI should surface “research-only” in a persistent but unobtrusive way, such as a footer badge and a short note near the onboarding call-to-action.
+  The UI should be structured with a minimal design system: typography scale, color tokens, and reusable components for KPI cards, tables, alerts, and empty states. Avoid unnecessary re-renders by memoizing expensive analysis steps and using file-size limits to protect the browser. Parsing should be robust: support JSON arrays, JSON objects, JSONL, and Anthropic message payloads. Large files should be handled defensively, with a clear size cap and a sample-size warning. The UI should surface “research-only” in a persistent but unobtrusive way, such as a footer badge and a short note near the onboarding call-to-action.
 
 ## 3) Data Model, Analysis Logic, and Quality Gates
 
