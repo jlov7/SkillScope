@@ -40,6 +40,40 @@ jobs:
           python -m skillscope.cli emit --demo
           python -m skillscope.cli analyze --demo
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: web/pnpm-lock.yaml
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install web dependencies
+        working-directory: web
+        run: pnpm install
+
+      - name: Web lint
+        working-directory: web
+        run: pnpm lint
+
+      - name: Web tests
+        working-directory: web
+        run: pnpm test
+
+      - name: Web build
+        working-directory: web
+        run: pnpm build
+
+      - name: Web e2e
+        working-directory: web
+        run: |
+          pnpm exec playwright install --with-deps
+          pnpm e2e
+
   artefacts:
     runs-on: ubuntu-latest
     needs: quality
