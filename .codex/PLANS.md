@@ -13,7 +13,7 @@
 - [x] Milestone 2: Build Studio UI flow (upload, replay controls, compare insights)
 - [x] Milestone 3: Add critical tests (unit + e2e) for new behavior
 - [x] Milestone 4: Update docs/help copy and run full quality gates
-- [ ] Milestone 5: Final release verification + sync
+- [x] Milestone 5: Final release verification + sync
 
 ## Exhaustive TODO Ledger
 
@@ -39,8 +39,8 @@
 - [x] Add/extend Playwright tests for Studio happy path
 - [x] Update help docs + README flow for Studio usage
 - [x] Run lint/test/build/e2e and fix all failures
-- [ ] Commit milestones in reviewable increments
-- [ ] Push and verify CI green
+- [x] Commit milestones in reviewable increments
+- [x] Push and verify CI green
 
 ## Surprises & Discoveries
 
@@ -60,12 +60,12 @@
 
 ## Outcomes & Retrospective
 
-- In progress.
-- Completed so far:
+- Completed:
   - Replay + compare core engine and heuristics.
   - Studio page with replay controls, root-cause insights, and skill deltas.
   - Unit and e2e coverage for new critical flow.
   - Docs updates for README/help/FAQ.
+  - GitHub CI green on `master` and Vercel production deployment ready.
 
 ## Verification Evidence
 
@@ -79,6 +79,9 @@
   - `pnpm build`
   - `pnpm e2e`
 - Result: all local checks passing.
+- Remote verification:
+  - GitHub Actions: https://github.com/jlov7/SkillScope/actions/runs/22039846344
+  - Vercel production: https://skillscope-amber.vercel.app/studio
 
 ---
 

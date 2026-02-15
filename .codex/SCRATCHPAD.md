@@ -4,7 +4,7 @@ Build and ship Replay + Compare Studio in the web UI with production-grade quali
 
 ## Status
 
-In Progress
+Completed
 
 ## Plan
 
@@ -14,7 +14,7 @@ In Progress
 4. [x] Add/expand e2e coverage for critical Studio flow
 5. [x] Update docs/help/README
 6. [x] Run full quality gates and fix regressions
-7. [ ] Commit milestones, push, verify CI and deployment
+7. [x] Commit milestones, push, verify CI and deployment
 
 ## Files Expected To Change
 
