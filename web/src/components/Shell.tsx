@@ -18,11 +18,20 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             <Link href="/" className="hover:underline">
               Home
             </Link>
-            <Link href="/analyze" className="hover:underline">
-              Analyze
+            <Link href="/start" className="hover:underline">
+              Start
             </Link>
             <Link href="/studio" className="hover:underline">
               Studio
+            </Link>
+            <Link href="/why" className="hover:underline">
+              Why
+            </Link>
+            <Link href="/demo-kit" className="hover:underline">
+              Demo Kit
+            </Link>
+            <Link href="/analyze" className="hover:underline">
+              Analyze
             </Link>
             <Link href="/demo" className="hover:underline">
               Demo

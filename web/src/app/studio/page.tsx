@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useMemo, useState } from "react";
 
 import EmptyState from "@/components/EmptyState";
 import Shell from "@/components/Shell";
@@ -14,11 +16,58 @@ import { studioBaselineData, studioCurrentData } from "@/lib/studio-demo";
 
 const MAX_BYTES = 8 * 1024 * 1024;
 const EMPTY_STEPS: ReplayStep[] = [];
+const DEMO_QUERY_LINK = "/studio?demo=1&guide=1";
 const PLAY_SPEEDS = [
   { label: "0.5x", value: 1600 },
   { label: "1x", value: 900 },
   { label: "1.5x", value: 600 },
   { label: "2x", value: 400 },
+];
+
+type WalkthroughStep = {
+  id: string;
+  title: string;
+  body: string;
+  target: string;
+  actionLabel: string;
+};
+
+const WALKTHROUGH_STEPS: WalkthroughStep[] = [
+  {
+    id: "load",
+    title: "Load known baseline and regression runs",
+    body: "Use demo runs to recreate a realistic baseline-vs-current failure scenario in seconds.",
+    target: "studio-upload",
+    actionLabel: "Load demo runs",
+  },
+  {
+    id: "replay",
+    title: "Inspect the execution timeline",
+    body: "Jump to replay and inspect the earliest steps before failure behavior appears.",
+    target: "studio-replay",
+    actionLabel: "Focus replay",
+  },
+  {
+    id: "animate",
+    title: "Animate behavior drift",
+    body: "Play through the current run to make timing and sequence changes easy to explain live.",
+    target: "studio-replay",
+    actionLabel: "Play timeline",
+  },
+  {
+    id: "insight",
+    title: "Show likely root causes",
+    body: "Use the generated root-cause cards to explain what changed and why it likely regressed.",
+    target: "studio-insights",
+    actionLabel: "Open root causes",
+  },
+  {
+    id: "delta",
+    title: "Land on concrete engineering action",
+    body: "Finish on skill-level deltas to assign next actions with clear before/after evidence.",
+    target: "studio-deltas",
+    actionLabel: "Open skill deltas",
+  },
 ];
 
 const numberFormatter = new Intl.NumberFormat("en-US");
@@ -49,6 +98,11 @@ const insightTone = (severity: string): string => {
   if (severity === "medium") return "border-amber-200 bg-amber-50";
   if (severity === "low") return "border-blue-200 bg-blue-50";
   return "border-[var(--border)] bg-white";
+};
+
+const scrollToSection = (id: string): void => {
+  const target = document.getElementById(id);
+  if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
 };
 
 function MetricCard({
@@ -126,13 +180,23 @@ function StepDetail({ step }: { step: ReplayStep | null }) {
   );
 }
 
-export default function StudioPage() {
-  const [baselineContent, setBaselineContent] = useState("");
-  const [currentContent, setCurrentContent] = useState("");
+function StudioContent() {
+  const searchParams = useSearchParams();
+  const requestedDemo = searchParams.get("demo") === "1";
+  const requestedGuide = searchParams.get("guide") === "1";
+
+  const [baselineContent, setBaselineContent] = useState(() =>
+    requestedDemo ? studioBaselineData : ""
+  );
+  const [currentContent, setCurrentContent] = useState(() =>
+    requestedDemo ? studioCurrentData : ""
+  );
   const [manualError, setManualError] = useState<string | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speedMs, setSpeedMs] = useState(900);
+  const [guideIndex, setGuideIndex] = useState<number | null>(() => (requestedGuide ? 0 : null));
+  const [copyNotice, setCopyNotice] = useState<string | null>(null);
 
   const analysis = useMemo((): { comparison: RunComparison | null; error: string | null } => {
     if (!baselineContent || !currentContent) return { comparison: null, error: null };
@@ -149,6 +213,8 @@ export default function StudioPage() {
   const maxStepIndex = Math.max(0, replaySteps.length - 1);
   const safeActiveIndex = Math.min(activeIndex, maxStepIndex);
   const activeStep = replaySteps[safeActiveIndex] ?? null;
+  const currentGuideStep = guideIndex === null ? null : WALKTHROUGH_STEPS[guideIndex];
+  const isGuideComplete = guideIndex !== null && guideIndex >= WALKTHROUGH_STEPS.length - 1;
 
   useEffect(() => {
     if (!isPlaying || replaySteps.length === 0 || safeActiveIndex >= replaySteps.length - 1) return;
@@ -201,6 +267,57 @@ export default function StudioPage() {
     setCurrentContent("");
     setIsPlaying(false);
     setActiveIndex(0);
+    setGuideIndex(null);
+  };
+
+  const applyGuideAction = (stepIndex: number) => {
+    const step = WALKTHROUGH_STEPS[stepIndex];
+    if (!step) return;
+
+    if (step.id === "load") loadDemo();
+    if (step.id === "replay") {
+      setIsPlaying(false);
+      setActiveIndex(0);
+    }
+    if (step.id === "animate") {
+      if (replaySteps.length > 0) setIsPlaying(true);
+    }
+    if (step.id === "insight") setIsPlaying(false);
+    if (step.id === "delta") setIsPlaying(false);
+
+    window.setTimeout(() => scrollToSection(step.target), 50);
+  };
+
+  const startGuide = () => {
+    setGuideIndex(0);
+    applyGuideAction(0);
+  };
+
+  const nextGuideStep = () => {
+    if (guideIndex === null) {
+      startGuide();
+      return;
+    }
+    const next = Math.min(guideIndex + 1, WALKTHROUGH_STEPS.length - 1);
+    setGuideIndex(next);
+    applyGuideAction(next);
+  };
+
+  const resetGuide = () => {
+    setGuideIndex(0);
+    applyGuideAction(0);
+  };
+
+  const copyDemoLink = async () => {
+    const absoluteUrl = `${window.location.origin}${DEMO_QUERY_LINK}`;
+    try {
+      await navigator.clipboard.writeText(absoluteUrl);
+      setCopyNotice("Demo link copied.");
+      window.setTimeout(() => setCopyNotice(null), 2500);
+    } catch {
+      setCopyNotice("Copy failed. Use the link shown below.");
+      window.setTimeout(() => setCopyNotice(null), 4000);
+    }
   };
 
   return (
@@ -225,6 +342,13 @@ export default function StudioPage() {
             </button>
             <button
               type="button"
+              onClick={startGuide}
+              className="px-4 py-2 rounded-full border border-[var(--border)]"
+            >
+              Start guided walkthrough
+            </button>
+            <button
+              type="button"
               onClick={clearAll}
               className="px-4 py-2 rounded-full border border-[var(--border)]"
             >
@@ -233,7 +357,87 @@ export default function StudioPage() {
           </div>
         </section>
 
-        <section className="grid gap-4 md:grid-cols-2">
+        <section className="rounded-3xl border border-[var(--border)] bg-white p-6 space-y-4">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-semibold">Presenter Mode</h2>
+              <p className="text-sm text-[var(--muted)]">
+                Use this guided sequence to demo SkillScope in a predictable, high-impact flow.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={copyDemoLink}
+              className="px-3 py-1.5 rounded-full border border-[var(--border)] text-sm"
+            >
+              Copy shareable demo link
+            </button>
+          </div>
+          {copyNotice && <p className="text-sm text-[var(--muted)]">{copyNotice}</p>}
+          <p className="text-xs text-[var(--muted)]">
+            Deep link:{" "}
+            <Link href={DEMO_QUERY_LINK} className="underline hover:no-underline">
+              {DEMO_QUERY_LINK}
+            </Link>
+          </p>
+          <ol className="grid gap-3 md:grid-cols-2">
+            {WALKTHROUGH_STEPS.map((step, index) => {
+              const active = guideIndex === index;
+              const done = guideIndex !== null && guideIndex > index;
+              return (
+                <li
+                  key={step.id}
+                  className={`rounded-2xl border p-3 ${
+                    active
+                      ? "border-[var(--accent)] bg-blue-50"
+                      : done
+                        ? "border-emerald-200 bg-emerald-50"
+                        : "border-[var(--border)]"
+                  }`}
+                >
+                  <p className="text-xs uppercase tracking-[0.14em] text-[var(--muted)]">
+                    Step {index + 1}
+                  </p>
+                  <p className="font-medium">{step.title}</p>
+                  <p className="text-sm text-[var(--muted)]">{step.body}</p>
+                </li>
+              );
+            })}
+          </ol>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={nextGuideStep}
+              className="px-3 py-1.5 rounded-full bg-[var(--accent)] text-white text-sm"
+            >
+              {guideIndex === null
+                ? "Begin guide"
+                : isGuideComplete
+                  ? "Repeat final step"
+                  : `Next: ${WALKTHROUGH_STEPS[Math.min(guideIndex + 1, WALKTHROUGH_STEPS.length - 1)].actionLabel}`}
+            </button>
+            {guideIndex !== null && (
+              <button
+                type="button"
+                onClick={resetGuide}
+                className="px-3 py-1.5 rounded-full border border-[var(--border)] text-sm"
+              >
+                Restart guide
+              </button>
+            )}
+            {guideIndex !== null && currentGuideStep && (
+              <button
+                type="button"
+                onClick={() => applyGuideAction(guideIndex)}
+                className="px-3 py-1.5 rounded-full border border-[var(--border)] text-sm"
+              >
+                Do current step action
+              </button>
+            )}
+          </div>
+        </section>
+
+        <section id="studio-upload" className="grid gap-4 md:grid-cols-2">
           <label className="rounded-2xl bg-white border border-[var(--border)] p-4">
             <span className="block text-sm font-medium mb-2">Baseline run</span>
             <input
@@ -271,11 +475,24 @@ export default function StudioPage() {
         {!comparison ? (
           <EmptyState
             title="No comparison yet"
-            body="Upload both baseline and current runs or load the demo to start replay and diff analysis."
+            body="Upload both baseline and current runs, or load the demo, to start replay and diff analysis."
+            cta={
+              <p className="text-sm text-[var(--muted)]">
+                Need context first? Visit{" "}
+                <Link href="/start" className="underline hover:no-underline">
+                  Start
+                </Link>{" "}
+                or{" "}
+                <Link href="/why" className="underline hover:no-underline">
+                  Why
+                </Link>
+                .
+              </p>
+            }
           />
         ) : (
           <div className="space-y-8">
-            <section className="rounded-2xl border border-[var(--border)] bg-white p-4">
+            <section id="studio-summary" className="rounded-2xl border border-[var(--border)] bg-white p-4">
               <p className="text-sm text-[var(--muted)]">Run summary</p>
               <p className="text-lg font-medium">{comparison.summaryText}</p>
             </section>
@@ -307,7 +524,7 @@ export default function StudioPage() {
               />
             </section>
 
-            <section className="grid gap-4 lg:grid-cols-[1.2fr_1fr]">
+            <section id="studio-replay" className="grid gap-4 lg:grid-cols-[1.2fr_1fr]">
               <div className="rounded-3xl border border-[var(--border)] bg-white p-6 space-y-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <h2 className="text-xl font-semibold">Replay current run</h2>
@@ -411,7 +628,7 @@ export default function StudioPage() {
               </div>
             </section>
 
-            <section className="rounded-3xl border border-[var(--border)] bg-white p-6 space-y-4">
+            <section id="studio-insights" className="rounded-3xl border border-[var(--border)] bg-white p-6 space-y-4">
               <h2 className="text-xl font-semibold">Likely root causes</h2>
               <div className="grid gap-3">
                 {comparison.insights.map((insight) => (
@@ -430,7 +647,7 @@ export default function StudioPage() {
               </div>
             </section>
 
-            <section className="rounded-3xl border border-[var(--border)] bg-white p-6">
+            <section id="studio-deltas" className="rounded-3xl border border-[var(--border)] bg-white p-6">
               <h2 className="text-xl font-semibold mb-3">Skill-level deltas</h2>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -468,5 +685,24 @@ export default function StudioPage() {
         )}
       </div>
     </Shell>
+  );
+}
+
+function StudioFallback() {
+  return (
+    <Shell>
+      <div className="rounded-3xl border border-[var(--border)] bg-white p-8">
+        <h1 className="text-2xl font-semibold">Loading Studio...</h1>
+        <p className="text-[var(--muted)] mt-2">Preparing replay and comparison workspace.</p>
+      </div>
+    </Shell>
+  );
+}
+
+export default function StudioPage() {
+  return (
+    <Suspense fallback={<StudioFallback />}>
+      <StudioContent />
+    </Suspense>
   );
 }

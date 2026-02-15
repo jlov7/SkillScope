@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "eslint src tests playwright.config.ts vitest.config.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "playwright test"

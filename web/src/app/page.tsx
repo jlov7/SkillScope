@@ -29,27 +29,30 @@ export default function HomePage() {
             uploads, no servers.
           </p>
           <div className="flex flex-wrap gap-3">
-            <Link href="/analyze" className="px-4 py-2 rounded-full bg-[var(--accent)] text-white">
-              Analyze data
-            </Link>
-            <Link href="/studio" className="px-4 py-2 rounded-full border border-[var(--border)]">
-              Open Studio
+            <Link href="/start" className="px-4 py-2 rounded-full bg-[var(--accent)] text-white">
+              Try in 60 seconds
             </Link>
             <Link
-              href="/demo"
+              href="/studio?demo=1&guide=1"
               className="px-4 py-2 rounded-full border border-[var(--border)]"
             >
-              Load demo
+              Guided demo
+            </Link>
+            <Link href="/why" className="px-4 py-2 rounded-full border border-[var(--border)]">
+              Why it matters
+            </Link>
+            <Link href="/demo-kit" className="px-4 py-2 rounded-full border border-[var(--border)]">
+              Presenter kit
             </Link>
           </div>
         </div>
         <div className="rounded-3xl bg-white border border-[var(--border)] p-6 shadow-sm">
-          <h2 className="text-2xl font-semibold mb-3">First run checklist</h2>
+          <h2 className="text-2xl font-semibold mb-3">Demo journey</h2>
           <ol className="space-y-2 text-[var(--muted)]">
-            <li>1. Export events via `skillscope emit` or `skillscope ingest`.</li>
-            <li>2. Upload JSON/JSONL on the Analyze page.</li>
-            <li>3. Use Studio to replay baseline vs current runs.</li>
-            <li>4. Share insights and root-cause notes with your team.</li>
+            <li>1. Open Start for a 60-second hands-on walkthrough.</li>
+            <li>2. Run guided Studio mode to replay baseline vs current behavior.</li>
+            <li>3. Use Why to explain value to technical and non-technical stakeholders.</li>
+            <li>4. Use Demo Kit for polished 90s, 5m, and 15m presentations.</li>
           </ol>
           {!seen && (
             <button
