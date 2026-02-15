@@ -8,7 +8,7 @@
 
 ## Progress
 
-- [ ] Milestone 0: Repo steering files + release checklist + ExecPlan
+- [x] Milestone 0: Repo steering files + release checklist + ExecPlan
 - [ ] Milestone 1: Web UI foundation (Next.js + Tailwind) and app shell
 - [ ] Milestone 2: Client-side analysis engine + unit tests
 - [ ] Milestone 3: Onboarding, demo flow, help page, and accessibility polish
