@@ -2,11 +2,11 @@
 
 SkillScope is an R&D repository maintained by an individual practitioner. There is no commercial service or dedicated support channel attached to the project.
 
-If you notice a security concern in the sample code:
+If you identify a security issue, use one of the following paths:
 
-1. [Open a GitHub issue](https://github.com/skillscope/skillscope/issues/new/choose) with clear reproduction steps and affected files.
-2. Mark the issue as “Security” or “Private” if you would like maintainers to review before public disclosure.
-3. Please allow at least 14 days for triage; this project is maintained in personal spare time.
+1. Preferred: open a private GitHub security advisory for this repository.
+1. Fallback: open a public GitHub issue at [jlov7/SkillScope](https://github.com/jlov7/SkillScope/issues/new/choose) with enough detail to reproduce.
+1. Include affected files, impact, and mitigation suggestions where possible.
 
 Sample commands in this repository do not perform outbound network access unless you explicitly configure API keys or exporter endpoints. The `ops/` stack runs entirely on localhost.
 

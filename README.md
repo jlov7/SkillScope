@@ -23,9 +23,9 @@ It is not sponsored by, affiliated with, or endorsed by my employer, and it does
 ## Quickstart (2 minutes)
 
 ```bash
-git clone https://github.com/skillscope/skillscope.git
-cd skillscope
-python -m pip install -e .[dev]
+git clone https://github.com/jlov7/SkillScope.git
+cd SkillScope
+uv sync --all-extras
 export SKILLSCOPE_CAPTURE=1     # optional JSON capture per provider call
 python examples/run_with_skill.py
 skillscope emit --demo          # emits synthetic spans/events to stdout

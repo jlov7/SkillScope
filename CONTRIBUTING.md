@@ -1,50 +1,67 @@
 # Contributing to SkillScope
 
-Thanks for your interest in improving SkillScope! This project is a research toolkit, and contributions that improve instrumentation, exporters, documentation, or demos are welcome.
+Thanks for your interest in improving SkillScope. Contributions that improve instrumentation, exporters, UI workflows, docs, and demo reliability are welcome.
 
-## Getting started
+## Local setup
 
-1. **Fork** the repository and clone your fork.
-2. **Install dependencies** in editable mode:
+1. Fork the repository and clone your fork.
 
-   ```bash
-   python -m pip install -e .[otlp]
-   ```
-
-3. **Run tests and demos** before making changes:
+1. Install Python and project dependencies:
 
    ```bash
-   pytest -q
-   python -m skillscope.cli emit --demo
-   python -m skillscope.cli analyze --demo
+   uv sync --all-extras
    ```
+
+1. Install web dependencies:
+
+   ```bash
+   cd web
+   pnpm install
+   cd ..
+   ```
+
+## Quality gates
+
+Run all checks before opening a PR:
+
+```bash
+uv run pytest
+uv run ruff check .
+uv run mypy skillscope
+uv run mdformat --check README.md docs
+
+cd web
+pnpm lint
+pnpm test
+pnpm build
+pnpm e2e
+```
 
 ## Development guidelines
 
-- **Code style**: follow PEP 8. Keep dependencies minimal and standard-library first.
-- **Tests**: add or update tests under `tests/` for new behavior. Every PR must keep `pytest` green.
-- **Documentation**: update relevant files in `README.md` and `docs/` when you add new features or flags. Screenshots or diagrams should live under `docs/assets/`.
-- **CLI compatibility**: maintain backward compatibility for existing commands whenever possible. Document breaking changes clearly.
-- **Semantic conventions**: changes to the `skill.*` attribute set should be discussed via issues before implementation to stay aligned with OpenTelemetry guidelines.
+- Keep the product publicly positioned as research-only.
+- Keep web analysis client-side by default unless a change explicitly requires backend behavior.
+- Add or update tests for behavioral changes.
+- Update docs (`README.md`, `docs/help.md`, `docs/faq.md`) when user-facing behavior changes.
+- Keep telemetry semantics aligned with OpenTelemetry + Agent Skills conventions.
 
 ## Pull request checklist
 
-- [ ] Tests added/updated
-- [ ] `pytest -q` passes
-- [ ] `python -m skillscope.cli emit --demo` succeeds
-- [ ] `python -m skillscope.cli analyze --demo` succeeds
-- [ ] Docs updated (README and/or `docs/`)
-- [ ] GitHub Actions workflow passes (see `.github/workflows/ci.yml`)
+- [ ] Tests added or updated as needed
+- [ ] Python checks pass (`pytest`, `ruff`, `mypy`)
+- [ ] Web checks pass (`lint`, `test`, `build`, `e2e`)
+- [ ] Docs updated for any user-visible change
+- [ ] CI is green
 
-## Issue reporting
+## Reporting issues
 
-Use GitHub issues to report bugs or propose enhancements. Include:
-- Description of the problem or idea
-- Steps to reproduce (if applicable)
-- Environment details (`python --version`, OS, relevant env vars)
+Open a GitHub issue with:
 
-## Code of conduct
+- Problem statement
+- Reproduction steps
+- Expected vs actual behavior
+- Environment details (`python --version`, OS, browser if relevant)
 
-Be respectful and constructive. This project values collaboration across disciplines (engineering, policy, ops). Harassment or discriminatory behavior is not tolerated.
+## License
 
-By contributing, you agree that your contributions will be licensed under the Apache-2.0 license.
+By contributing, you agree that your contributions are licensed under Apache-2.0.
