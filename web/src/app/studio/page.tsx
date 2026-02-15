@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 
 import EmptyState from "@/components/EmptyState";
 import Shell from "@/components/Shell";
@@ -69,6 +69,13 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     actionLabel: "Open skill deltas",
   },
 ];
+
+const STORY_JUMPS = [
+  { id: "studio-summary", label: "Jump to summary" },
+  { id: "studio-replay", label: "Jump to replay" },
+  { id: "studio-insights", label: "Jump to root causes" },
+  { id: "studio-deltas", label: "Jump to skill deltas" },
+] as const;
 
 const numberFormatter = new Intl.NumberFormat("en-US");
 
@@ -216,6 +223,55 @@ function StudioContent() {
   const currentGuideStep = guideIndex === null ? null : WALKTHROUGH_STEPS[guideIndex];
   const isGuideComplete = guideIndex !== null && guideIndex >= WALKTHROUGH_STEPS.length - 1;
 
+  const stepBackward = useCallback(() => {
+    setActiveIndex((index) => Math.max(index - 1, 0));
+  }, []);
+
+  const stepForward = useCallback(() => {
+    setActiveIndex((index) => Math.min(index + 1, Math.max(replaySteps.length - 1, 0)));
+  }, [replaySteps.length]);
+
+  const toggleReplay = useCallback(() => {
+    if (isPlaying) {
+      setIsPlaying(false);
+      return;
+    }
+    if (replaySteps.length === 0) return;
+    if (safeActiveIndex >= replaySteps.length - 1) setActiveIndex(0);
+    setIsPlaying(true);
+  }, [isPlaying, replaySteps.length, safeActiveIndex]);
+
+  useEffect(() => {
+    if (!comparison) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      if (!(event.target instanceof HTMLElement)) return;
+      if (
+        event.target.isContentEditable ||
+        ["INPUT", "TEXTAREA", "SELECT", "BUTTON"].includes(event.target.tagName)
+      ) {
+        return;
+      }
+      if (event.key === " ") {
+        event.preventDefault();
+        toggleReplay();
+        return;
+      }
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        stepForward();
+        return;
+      }
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        stepBackward();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [comparison, stepBackward, stepForward, toggleReplay]);
+
   useEffect(() => {
     if (!isPlaying || replaySteps.length === 0 || safeActiveIndex >= replaySteps.length - 1) return;
     const timer = window.setTimeout(() => {
@@ -357,6 +413,58 @@ function StudioContent() {
           </div>
         </section>
 
+        <section id="studio-guide" className="rounded-3xl border border-[var(--border)] bg-white p-6 space-y-4">
+          <div>
+            <h2 className="text-xl font-semibold">How to use Studio</h2>
+            <p className="text-sm text-[var(--muted)]">
+              Follow this story flow: load data, replay behavior, explain likely root causes, then
+              assign a concrete next action.
+            </p>
+          </div>
+          <ol className="grid gap-3 md:grid-cols-4">
+            <li className="rounded-2xl border border-[var(--border)] p-3">
+              <p className="text-xs uppercase tracking-[0.14em] text-[var(--muted)]">1. Setup</p>
+              <p className="text-sm font-medium">Load demo or upload runs</p>
+            </li>
+            <li className="rounded-2xl border border-[var(--border)] p-3">
+              <p className="text-xs uppercase tracking-[0.14em] text-[var(--muted)]">2. Replay</p>
+              <p className="text-sm font-medium">Use scrubber, steps, and speed controls</p>
+            </li>
+            <li className="rounded-2xl border border-[var(--border)] p-3">
+              <p className="text-xs uppercase tracking-[0.14em] text-[var(--muted)]">3. Triage</p>
+              <p className="text-sm font-medium">Review root-cause insight cards</p>
+            </li>
+            <li className="rounded-2xl border border-[var(--border)] p-3">
+              <p className="text-xs uppercase tracking-[0.14em] text-[var(--muted)]">4. Decide</p>
+              <p className="text-sm font-medium">Use skill deltas to pick the next fix</p>
+            </li>
+          </ol>
+          <div className="flex flex-wrap gap-2">
+            {STORY_JUMPS.map((jump) => (
+              <button
+                key={jump.id}
+                type="button"
+                onClick={() => scrollToSection(jump.id)}
+                className="px-3 py-1.5 rounded-full border border-[var(--border)] text-sm"
+              >
+                {jump.label}
+              </button>
+            ))}
+          </div>
+          <details className="rounded-2xl border border-[var(--border)] p-4">
+            <summary className="cursor-pointer font-medium">Need help troubleshooting?</summary>
+            <ul className="mt-3 list-disc pl-5 text-sm text-[var(--muted)] space-y-1">
+              <li>Use `/studio?demo=1&guide=1` for the most predictable first run.</li>
+              <li>Accepted uploads: `.json`, `.jsonl`, `.ndjson` (up to 8MB each).</li>
+              <li>If parsing fails, retry with demo runs to isolate data-format issues first.</li>
+            </ul>
+            <p className="mt-3 text-sm text-[var(--muted)]">
+              Keyboard shortcuts: `Space` play/pause, `Arrow Left` previous step, `Arrow Right` next
+              step.
+            </p>
+          </details>
+        </section>
+
         <section className="rounded-3xl border border-[var(--border)] bg-white p-6 space-y-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
@@ -373,7 +481,11 @@ function StudioContent() {
               Copy shareable demo link
             </button>
           </div>
-          {copyNotice && <p className="text-sm text-[var(--muted)]">{copyNotice}</p>}
+          {copyNotice && (
+            <p aria-live="polite" className="text-sm text-[var(--muted)]">
+              {copyNotice}
+            </p>
+          )}
           <p className="text-xs text-[var(--muted)]">
             Deep link:{" "}
             <Link href={DEMO_QUERY_LINK} className="underline hover:no-underline">
@@ -531,7 +643,7 @@ function StudioContent() {
                   <div className="flex flex-wrap items-center gap-2">
                     <button
                       type="button"
-                      onClick={() => setActiveIndex((index) => Math.max(index - 1, 0))}
+                      onClick={stepBackward}
                       className="px-3 py-1.5 rounded-full border border-[var(--border)] text-sm"
                       aria-label="Previous step"
                     >
@@ -539,14 +651,7 @@ function StudioContent() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => {
-                        if (isPlaying) {
-                          setIsPlaying(false);
-                          return;
-                        }
-                        if (safeActiveIndex >= replaySteps.length - 1) setActiveIndex(0);
-                        setIsPlaying(true);
-                      }}
+                      onClick={toggleReplay}
                       className="px-3 py-1.5 rounded-full bg-[var(--accent)] text-white text-sm"
                       aria-label={isPlaying ? "Pause replay" : "Play replay"}
                     >
@@ -554,9 +659,7 @@ function StudioContent() {
                     </button>
                     <button
                       type="button"
-                      onClick={() =>
-                        setActiveIndex((index) => Math.min(index + 1, Math.max(replaySteps.length - 1, 0)))
-                      }
+                      onClick={stepForward}
                       className="px-3 py-1.5 rounded-full border border-[var(--border)] text-sm"
                       aria-label="Next step"
                     >
@@ -595,6 +698,9 @@ function StudioContent() {
                     className="w-full mt-2"
                     aria-label="Timeline scrubber"
                   />
+                  <p className="mt-2 text-xs text-[var(--muted)]">
+                    Keyboard shortcuts: Space play/pause, left/right arrows to step.
+                  </p>
                 </div>
 
                 <StepDetail step={activeStep} />

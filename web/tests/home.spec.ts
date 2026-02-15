@@ -37,6 +37,14 @@ test("studio deep link preloads guided demo", async ({ page }) => {
   await expect(page.getByText(/Run summary/i)).toBeVisible();
 });
 
+test("studio includes in-app guide and help mechanics", async ({ page }) => {
+  await page.goto("/studio?demo=1&guide=1");
+  await expect(page.getByRole("heading", { name: /How to use Studio/i })).toBeVisible();
+  await expect(page.getByText(/left\/right arrows to step/i)).toBeVisible();
+  await page.getByRole("button", { name: /Jump to root causes/i }).click();
+  await expect(page.getByRole("heading", { name: /Likely root causes/i })).toBeVisible();
+});
+
 test("studio demo comparison shows insights", async ({ page }) => {
   await page.goto("/studio");
   await page.getByRole("button", { name: /load demo runs/i }).click();
