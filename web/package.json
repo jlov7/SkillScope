@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint src tests playwright.config.ts vitest.config.ts",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "playwright test"
