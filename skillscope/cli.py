@@ -9,13 +9,21 @@ from typing import Any, Iterable, Iterator, List, Mapping, Optional, Sequence
 from . import __version__
 from .example_data import demo_skill_events, load_demo_skill_summary
 from .exporters import configure_exporters, export_events
+from .normalization import (
+    load_events_from_source as _load_events_from_source_api,
+)
+from .normalization import (
+    normalize_events as _normalize_events_api,
+)
+from .normalization import (
+    safe_int as _safe_int_api,
+)
 from .semconv import (
     GENAI_MODEL,
     GENAI_TOKEN_USAGE,
     GENAI_USAGE_INPUT,
     GENAI_USAGE_OUTPUT,
     SKILL_NAME,
-    skill_attrs,
 )
 from .skills import (
     SkillProblem,
@@ -37,61 +45,11 @@ def _iter_paths(path: Path) -> Iterator[Path]:
 
 
 def _safe_int(value: Any) -> Optional[int]:
-    if value is None or value == "":
-        return None
-    try:
-        return int(value)
-    except (TypeError, ValueError):
-        return None
+    return _safe_int_api(value)
 
 
 def _normalize_events(events: Iterable[dict]) -> List[dict]:
-    normalized: List[dict] = []
-    for event in events:
-        attrs = event.get("attrs", {}).copy()
-        metadata = event.get("metadata") or {}
-        if metadata:
-            attrs.update({k: v for k, v in metadata.items() if k.startswith("skill.")})
-
-        input_tokens = _safe_int(event.get("input_tokens") or attrs.get(GENAI_USAGE_INPUT))
-        output_tokens = _safe_int(event.get("output_tokens") or attrs.get(GENAI_USAGE_OUTPUT))
-        legacy_tokens = _safe_int(event.get("token_usage") or attrs.get(GENAI_TOKEN_USAGE))
-
-        if not attrs.get(SKILL_NAME):
-            attrs = skill_attrs(
-                name=attrs.get("skill.name") or event.get("skill", "unknown"),
-                version=attrs.get("skill.version") or event.get("version"),
-                description=attrs.get("skill.description") or event.get("description"),
-                files=attrs.get("skill.files", "").split(",") if attrs.get("skill.files") else event.get("files") or [],
-                policy_required=attrs.get("skill.policy_required") or bool(event.get("policy_required", False)),
-                progressive_level=attrs.get("skill.progressive_level") or event.get("progressive_level", "referenced"),
-                model=event.get("model"),
-                input_tokens=input_tokens,
-                output_tokens=output_tokens,
-                token_usage=legacy_tokens,
-                operation=event.get("operation"),
-                agent_operation=event.get("agent_operation"),
-            )
-        else:
-            canonical = skill_attrs(name=attrs.get(SKILL_NAME))
-            canonical.update(attrs)
-            if input_tokens is not None:
-                canonical[GENAI_USAGE_INPUT] = input_tokens
-            if output_tokens is not None:
-                canonical[GENAI_USAGE_OUTPUT] = output_tokens
-            if legacy_tokens is not None:
-                canonical[GENAI_TOKEN_USAGE] = legacy_tokens
-            attrs = canonical
-
-        normalized.append(
-            {
-                "ts": event.get("ts"),
-                "event": event.get("event", "span"),
-                "attrs": attrs,
-                "metadata": metadata,
-            }
-        )
-    return normalized
+    return _normalize_events_api(events)
 
 
 def _read_input(path: Path | None) -> str:
@@ -163,18 +121,7 @@ def _anthropic_messages_to_events(payload: dict) -> List[dict]:
 
 
 def load_events_from_source(path: Path | None, input_format: str) -> List[dict]:
-    if path and path.is_dir():
-        aggregate: List[dict] = []
-        for child in _iter_paths(path):
-            aggregate.extend(load_events_from_source(child, input_format))
-        return aggregate
-    content = _read_input(path)
-    detected = _detect_format(content, input_format)
-    if detected == "anthropic":
-        return _anthropic_messages_to_events(json.loads(content))
-    if detected == "jsonl":
-        return _parse_jsonl_content(content)
-    return _parse_json_content(content)
+    return _load_events_from_source_api(path, input_format)
 
 
 def _summarize_events(events: Iterable[Mapping]) -> dict:

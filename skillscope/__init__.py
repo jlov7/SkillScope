@@ -12,6 +12,7 @@ from .instrumentation import (  # noqa: F401
     use_tool,
     with_skill,
 )
+from .normalization import load_events_from_source, normalize_event, normalize_events  # noqa: F401
 from .semconv import skill_attrs  # noqa: F401
 from .skills import read_skill_metadata, validate_skill_dir  # noqa: F401
 
@@ -27,6 +28,9 @@ __all__ = [
     "default_token_estimator",
     "RECORDER",
     "skill_attrs",
+    "normalize_event",
+    "normalize_events",
+    "load_events_from_source",
     "read_skill_metadata",
     "validate_skill_dir",
 ]
